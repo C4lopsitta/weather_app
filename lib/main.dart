@@ -10,7 +10,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,36 +17,24 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData.dark(useMaterial3: true),
       theme: ThemeData.light(useMaterial3: true),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const ApplicationRoot(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class ApplicationRoot extends StatefulWidget {
+  const ApplicationRoot({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ApplicationRoot> createState() => _ApplicationRoot();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
-
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //   title: Text(widget.title),
-      // ),
       body: [
           CurrentWeather(),
           HistoricalWeather(),
