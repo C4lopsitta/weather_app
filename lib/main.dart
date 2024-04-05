@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/pages/current_weather.dart';
+import 'package:weather_app/pages/historical_weather.dart';
+import 'package:weather_app/pages/settings.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,9 +49,9 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: [
-          Text("Current"),
-          Text("Historical"),
-          Text("Settings")
+          CurrentWeather(),
+          HistoricalWeather(),
+          Settings()
         ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
