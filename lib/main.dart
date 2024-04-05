@@ -44,9 +44,21 @@ class _ApplicationRoot extends State<ApplicationRoot> {
         onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
         selectedIndex: currentPageIndex,
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.wb_cloudy_outlined), label: "Current"),
-          NavigationDestination(icon: Icon(Icons.history), label: "Historical"),
-          NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
+          NavigationDestination(
+              icon: Icon(Icons.wb_cloudy_outlined),
+              selectedIcon: Icon(Icons.wb_cloudy_rounded),
+              label: "Current"
+          ),
+          NavigationDestination(
+              icon: Icon(Icons.history_outlined),
+              selectedIcon: Icon(Icons.history_rounded),
+              label: "Historical"
+          ),
+          NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings_rounded),
+              label: "Settings"
+          )
         ],
       ),
     );
