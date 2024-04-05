@@ -29,13 +29,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int currentPageIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,32 +45,18 @@ class _MyHomePageState extends State<MyHomePage> {
       //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       //   title: Text(widget.title),
       // ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: [
+          Text("Current"),
+          Text("Historical"),
+          Text("Settings")
+        ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {},
-        selectedIndex: 0,
-        destinations: [
+        onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
+        selectedIndex: currentPageIndex,
+        destinations: const [
           NavigationDestination(icon: Icon(Icons.wb_cloudy_outlined), label: "Current"),
           NavigationDestination(icon: Icon(Icons.history), label: "Historical"),
-          
+          NavigationDestination(icon: Icon(Icons.settings), label: "Settings")
         ],
       ),
     );
