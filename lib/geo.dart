@@ -1,6 +1,8 @@
-import 'dart:ffi';
-
 import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
+
+const String _nominatimURL = "nominatim.openstreetmap.org/";
+const String _nominatimSearch = "search/";
 
 class Geo {
   Geo(this.lat, this.lon, this.serviceEnabled, this.permissionGranted);
@@ -11,7 +13,7 @@ class Geo {
   bool permissionGranted = true;
 }
 
-Future<Geo> _getLocation() async {
+Future<Geo> getLocation() async {
   Location location = Location();
   bool _serviceEnabled;
   PermissionStatus _permissionStatus;
@@ -29,7 +31,18 @@ Future<Geo> _getLocation() async {
   }
 
   LocationData data = await location.getLocation();
-  return Geo(data.latitude!, data.longitude!, true, true); //TODO)) Add checks
+  if(data.longitude == null || data.latitude == null) return Geo(0.0, 0.0, true, true);
+
+  return Geo(data.latitude!, data.longitude!, true, true);
+}
+
+Future<Geo> geocodeLocation(String location) async {
+  Map<String, String> params = {"q": location, "format": "jsonv2"};
+  Uri uri = Uri.https(_nominatimURL, _nominatimSearch, params);
+
+  http.get(uri).then((response) {
+
+  });
 }
 
 
