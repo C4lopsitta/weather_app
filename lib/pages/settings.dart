@@ -12,6 +12,7 @@ class _Settings extends State<Settings> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Text("Settings")
       ],
     );

@@ -12,6 +12,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Text("Historical Weather")
       ],
     );

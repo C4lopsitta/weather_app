@@ -12,6 +12,7 @@ class _CurrentWeather extends State<CurrentWeather> {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Text("Current Weather")
       ],
     );
