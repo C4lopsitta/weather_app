@@ -4,8 +4,10 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/exceptions/geo_exception.dart';
 
+
 const String _nominatimURL = "nominatim.openstreetmap.org/";
 const String _nominatimSearch = "search/";
+
 
 class Geo {
   Geo(this.lat, this.lon, {this.city});
@@ -14,6 +16,7 @@ class Geo {
   final double lon;
   final String? city;
 }
+
 
 Future<Geo> getLocation() async {
   Location location = Location();
@@ -37,6 +40,7 @@ Future<Geo> getLocation() async {
 
   return Geo(data.latitude!, data.longitude!);
 }
+
 
 Future<List<Geo>?> geocodeLocation(String location) async {
   Map<String, String> params = {"q": location, "format": "geocodejson"};
