@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/Weather_api.dart';
 import 'package:weather_app/pages/current_weather.dart';
 import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
@@ -34,6 +35,8 @@ class _ApplicationRoot extends State<ApplicationRoot> {
 
   @override
   Widget build(BuildContext context) {
+    // Weather_api w = new Weather_api();
+    // print(w.call_api());
     return Scaffold(
       body: [
           CurrentWeather(),

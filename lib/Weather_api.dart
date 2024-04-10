@@ -32,7 +32,6 @@ class Weather_api{
     print(uri.query);
     http.get(uri).then(
             (result){
-
               print(json.decode(result.body));
         }
     );
