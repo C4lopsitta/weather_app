@@ -1,43 +1,41 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:weather_app/exceptions/geo_exception.dart';
 
 const String _nominatimURL = "nominatim.openstreetmap.org/";
 const String _nominatimSearch = "search/";
 
 class Geo {
-  Geo(this.lat, this.lon, {this.serviceEnabled = false, this.permissionGranted = false, this.city});
+  Geo(this.lat, this.lon, {this.city});
 
   final double lat;
   final double lon;
-  bool serviceEnabled;
-  bool permissionGranted;
   final String? city;
 }
 
 Future<Geo> getLocation() async {
   Location location = Location();
-  bool _serviceEnabled;
-  PermissionStatus _permissionStatus;
+  bool serviceEnabled;
+  PermissionStatus permissionStatus;
 
-  _serviceEnabled = await location.serviceEnabled();
-  if(!_serviceEnabled) {
-    _serviceEnabled = await location.requestService();
-    if(!_serviceEnabled) return Geo(0.0, 0.0, serviceEnabled: false);
+  serviceEnabled = await location.serviceEnabled();
+  if(!serviceEnabled) {
+    serviceEnabled = await location.requestService();
+    if(!serviceEnabled) throw GeoException("Service unavailable", serviceEnabled: false);
   }
 
-  _permissionStatus = await location.hasPermission();
-  if(_permissionStatus == PermissionStatus.denied) {
-    _permissionStatus = await location.requestPermission();
-    if(_permissionStatus != PermissionStatus.granted) return Geo(0.0, 0.0, permissionGranted: false);
+  permissionStatus = await location.hasPermission();
+  if(permissionStatus == PermissionStatus.denied) {
+    permissionStatus = await location.requestPermission();
+    if(permissionStatus != PermissionStatus.granted) throw GeoException("Permission not granted", permission: false);
   }
 
   LocationData data = await location.getLocation();
-  if(data.longitude == null || data.latitude == null) return Geo(0.0, 0.0, permissionGranted: true, serviceEnabled: true);
+  if(data.longitude == null || data.latitude == null) return Geo(0.0, 0.0);
 
-  return Geo(data.latitude!, data.longitude!, permissionGranted: true, serviceEnabled: true);
+  return Geo(data.latitude!, data.longitude!);
 }
 
 Future<List<Geo>?> geocodeLocation(String location) async {
