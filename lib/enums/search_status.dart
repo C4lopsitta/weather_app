@@ -1,0 +1,6 @@
+enum SearchStatus {
+  UNDEFINED,
+  NO_SUGGESTIONS,
+  SEARCHING,
+  SUGGESTING
+}

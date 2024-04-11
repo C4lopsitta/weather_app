@@ -5,16 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:weather_app/exceptions/geo_exception.dart';
 
 
-const String _nominatimURL = "nominatim.openstreetmap.org/";
-const String _nominatimSearch = "search/";
+const String _nominatimURL = "nominatim.openstreetmap.org";
+const String _nominatimSearch = "/search";
 
 
 class Geo {
-  Geo(this.lat, this.lon, {this.city});
+  Geo(this.lat, this.lon, {this.city, this.fullName});
 
   final double lat;
   final double lon;
   final String? city;
+  final String? fullName;
 }
 
 
@@ -43,24 +44,31 @@ Future<Geo> getLocation() async {
 
 
 Future<List<Geo>?> geocodeLocation(String location) async {
-  Map<String, String> params = {"q": location, "format": "geocodejson"};
-  Uri uri = Uri.https(_nominatimURL, _nominatimSearch, params);
+  Map<String, String> params = {"q": location, "format": "geojson"};
+  Uri uri;
 
+  try {
+    uri = Uri.https(_nominatimURL, _nominatimSearch, params);
+  } catch (exception) { rethrow; }
   List<Geo> geocodes = [];
 
-  http.get(uri).then((response) {
-    List<Map<String, dynamic>> features = jsonDecode(response.body)["features"];
-    features.forEach((feature) {
-      List<dynamic> coords = feature["geometry"]["coordinates"];
-      String placeName = feature["properties"]["geocoding"]["name"] ?? "UNDEFINED";
+  try {
+    http.get(uri).then((response) {
+      print("Request made, gotten:\n${response.body}");
 
-      geocodes.add(Geo(coords[1], coords[2], city: placeName));
+      List<dynamic> features = jsonDecode(response.body)["features"];
+      features.forEach((feature) {
+        List<dynamic> coords = feature["geometry"]["coordinates"];
+        String placeName = feature["properties"]["name"] ?? "UNDEFINED";
+        String fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
+
+        geocodes.add(
+            Geo(coords[0], coords[1], city: placeName, fullName: fullName));
+      });
     });
+  } catch (exception) { rethrow; }
 
-    return geocodes;
-  });
-
-  return null;
+  return (geocodes.isEmpty) ? null : geocodes;
 }
 
 

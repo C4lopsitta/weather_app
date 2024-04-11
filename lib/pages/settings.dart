@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/geo.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -6,6 +7,9 @@ class Settings extends StatefulWidget {
 }
 
 class _Settings extends State<Settings> {
+  String _geolocation = "";
+  TextEditingController _location = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -13,7 +17,7 @@ class _Settings extends State<Settings> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
-        Text("Settings")
+
       ],
     );
   }
