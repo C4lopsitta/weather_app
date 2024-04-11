@@ -16,6 +16,10 @@ class Geo {
   final double lon;
   final String? city;
   final String? fullName;
+
+  String toString() {
+    return "GEO: {lat: $lat, lon: $lon, city: $city, fullName: $fullName}";
+  }
 }
 
 
@@ -52,24 +56,20 @@ Future<List<Geo>?> geocodeLocation(String location) async {
   } catch (exception) { rethrow; }
   List<Geo> geocodes = [];
 
-  try {
-    http.get(uri).then((response) {
-      print("Request made, gotten:\n${response.body}");
+  await http.get(uri).then((response) {
 
-      List<dynamic> features = jsonDecode(response.body)["features"];
-      features.forEach((feature) {
-        List<dynamic> coords = feature["geometry"]["coordinates"];
-        String placeName = feature["properties"]["name"] ?? "UNDEFINED";
-        String fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
+    List<dynamic> features = jsonDecode(response.body)["features"];
+    features.forEach((feature) {
+      List<dynamic> coords = feature["geometry"]["coordinates"];
+      String placeName = feature["properties"]["name"] ?? "UNDEFINED";
+      String fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
 
-        geocodes.add(
-            Geo(coords[0], coords[1], city: placeName, fullName: fullName));
-      });
+      geocodes.add(
+          Geo(coords[0], coords[1], city: placeName, fullName: fullName));
     });
-  } catch (exception) { rethrow; }
+  });
 
   return (geocodes.isEmpty) ? null : geocodes;
 }
-
 
 

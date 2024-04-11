@@ -10,46 +10,32 @@ class CurrentWeather extends StatefulWidget {
 }
 
 class _CurrentWeather extends State<CurrentWeather> {
-  Iterable<Widget> _getSuggestions(SearchController controller) {
-    // check if something was actually searched
-    if(controller.text.isEmpty) {
-      _searchStatus = SearchStatus.NO_SUGGESTIONS;
-      return [];
-    }
-    // check if a suggestion is already being prepared
-    if(_searchStatus == SearchStatus.SUGGESTING) _lastSuggestionSet;
-    _searchStatus = SearchStatus.SUGGESTING;
+  Future _getSuggestions(SearchController controller, String searchKey) async {
+    List<Widget> suggestions = [];
 
-    List<ListTile> suggestions = [];
-
-    try {
-      geocodeLocation(controller.text).then((geos) {
-        geos?.forEach((geo) {
-          suggestions.add(ListTile(
-            title: Text(geo.city ?? "UNDEFINED"),
-            subtitle: Text(geo.fullName ?? ""),
-            onTap: () {
-              Geo self = geo;
-              controller.closeView(geo.city);
-            },
-          ));
-        });
-
+    await geocodeLocation(searchKey).then((geos) {
+      geos?.forEach((geo) {
+        print(geo.toString());
+        suggestions.add(ListTile(
+          title: Text(geo.city ?? "UNDEFINED"),
+          subtitle: Text(geo.fullName ?? ""),
+          onTap: () {
+            Geo self = geo;
+            controller.closeView(geo.city);
+          },
+        ));
       });
-    } catch(exception) {
-      return [
-        Center(
-          child: Text("Something went wrong!\n${exception.toString()}"),
-        )
-      ];
-    }
 
-    _lastSuggestionSet = suggestions;
-    return (suggestions.isEmpty) ? [ const Center(child: Text("Something went wrong")) ] : suggestions;
+      print("\n\nSetting state!\n${suggestions.length}\n");
+      setState(() {
+        _suggestionSet = suggestions;
+      });
+    });
   }
 
-  SearchStatus _searchStatus = SearchStatus.NO_SUGGESTIONS;
-  Iterable<Widget> _lastSuggestionSet = [];
+  final SearchController _searchController = SearchController();
+  final TextEditingController _searchTextController = TextEditingController();
+  List<Widget> _suggestionSet = [ ];
 
   @override
   Widget build(BuildContext context) {
@@ -64,23 +50,27 @@ class _CurrentWeather extends State<CurrentWeather> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SearchAnchor.bar(
-                onSubmitted: (_) { _searchStatus = SearchStatus.SEARCHING; },
-                onChanged: (_) { _searchStatus = SearchStatus.NO_SUGGESTIONS; },
-                barPadding: const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 12)),
-                barHintText: "Search for a place",
-                suggestionsBuilder: (context, controller) {
-                  if(_searchStatus == SearchStatus.NO_SUGGESTIONS) {
-                    return [
-                      const Center(
-                        child: Text("Start searching to get suggestions")
-                      )
-                    ];
-                  } else if (_searchStatus == SearchStatus.SEARCHING || _searchStatus == SearchStatus.SUGGESTING) {
-                    return _getSuggestions(controller);
-                  } else return [];
-                }
-              ),
+              SearchAnchor(
+                searchController: _searchController,
+                isFullScreen: false,
+                builder: (context, controller) =>
+                  SearchBar(
+                    controller: _searchTextController,
+                    onTap: () { _searchController.openView(); },
+                  ),
+                viewOnSubmitted: (searchKey) {
+                  if(searchKey.isEmpty) return;
+                  _getSuggestions(_searchController, searchKey);
+                },
+
+                viewBuilder: (set) {
+                  _getSuggestions(_searchController, _searchTextController.text);
+                  return SingleChildScrollView(child: Column(children: set.toList()));
+                },
+                suggestionsBuilder: (_, __) async {
+                  return _suggestionSet;
+                },
+              )
 
             ],
           ),
