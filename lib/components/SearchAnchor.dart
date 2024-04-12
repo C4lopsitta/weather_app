@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
-
 
 import 'package:flutter/material.dart';
 
@@ -21,21 +19,9 @@ const Curve _kViewListFadeOnInterval = Interval(133 / _kOpenViewMilliseconds, 23
 
 /// Signature for a function that creates a [Widget] which is used to open a search view.
 ///
-/// The `controller` callback provided to [SearchAnchor.builder] can be used
+/// The `controller` callback provided to [ExposedSearchAnchor.builder] can be used
 /// to open the search view and control the editable field on the view.
 typedef SearchAnchorChildBuilder = Widget Function(BuildContext context, SearchController controller);
-
-/// Signature for a function that creates a [Widget] to build the suggestion list
-/// based on the input in the search bar.
-///
-/// The `controller` callback provided to [SearchAnchor.suggestionsBuilder] can be used
-/// to close the search view and control the editable field on the view.
-typedef SuggestionsBuilder = FutureOr<Iterable<Widget>> Function(BuildContext context, SearchController controller);
-
-/// Signature for a function that creates a [Widget] to layout the suggestion list.
-///
-/// Parameter `suggestions` is the content list that this function wants to lay out.
-typedef ViewBuilder = Widget Function(Iterable<Widget> suggestions);
 
 //endregion definitions
 
@@ -48,7 +34,7 @@ typedef ViewBuilder = Widget Function(Iterable<Widget> suggestions);
 /// and then calling [SearchController.openView] or by tapping on an anchor.
 /// When the anchor is tapped or [SearchController.openView] is called, the search view either
 /// grows to a specific size, or grows to fill the entire screen. By default,
-/// the search view only shows full screen on mobile platforms. Use [SearchAnchor.isFullScreen]
+/// the search view only shows full screen on mobile platforms. Use [ExposedSearchAnchor.isFullScreen]
 /// to override the default setting.
 ///
 /// The search view is usually opened by a [SearchBar], an [IconButton] or an [Icon].
@@ -61,7 +47,7 @@ typedef ViewBuilder = Widget Function(Iterable<Widget> suggestions);
 /// device from portrait mode to landscape mode, will not close the search view.
 ///
 /// {@tool dartpad}
-/// This example shows how to use an IconButton to open a search view in a [SearchAnchor].
+/// This example shows how to use an IconButton to open a search view in a [ExposedSearchAnchor].
 /// It also shows how to use [SearchController] to open or close the search view route.
 ///
 /// ** See code in examples/api/lib/material/search_anchor/search_anchor.2.dart **
@@ -69,7 +55,7 @@ typedef ViewBuilder = Widget Function(Iterable<Widget> suggestions);
 ///
 /// {@tool dartpad}
 /// This example shows how to set up a floating (or pinned) AppBar with a
-/// [SearchAnchor] for a title.
+/// [ExposedSearchAnchor] for a title.
 ///
 /// ** See code in examples/api/lib/material/search_anchor/search_anchor.1.dart **
 /// {@end-tool}
@@ -92,15 +78,15 @@ typedef ViewBuilder = Widget Function(Iterable<Widget> suggestions);
 /// * [SearchBar], a widget that defines a search bar.
 /// * [SearchBarTheme], a widget that overrides the default configuration of a search bar.
 /// * [SearchViewTheme], a widget that overrides the default configuration of a search view.
-class SearchAnchor extends StatefulWidget {
-  /// Creates a const [SearchAnchor].
+class ExposedSearchAnchor extends StatefulWidget {
+  /// Creates a const [ExposedSearchAnchor].
   ///
   /// The [builder] and [suggestionsBuilder] arguments are required.
-  const SearchAnchor({
+  ExposedSearchAnchor({
     super.key,
     this.isFullScreen,
     this.searchController,
-    this.viewBuilder,
+    // this.viewBuilder,
     this.viewLeading,
     this.viewTrailing,
     this.viewHintText,
@@ -117,63 +103,12 @@ class SearchAnchor extends StatefulWidget {
     this.viewOnChanged,
     this.viewOnSubmitted,
     required this.builder,
-    required this.suggestionsBuilder,
+    required this.suggestions,
+    // required this.suggestionsBuilder,
     this.textInputAction,
     this.keyboardType,
   });
 
-  /// Create a [SearchAnchor] that has a [SearchBar] which opens a search view.
-  ///
-  /// All the barX parameters are used to customize the anchor. Similarly, all the
-  /// viewX parameters are used to override the view's defaults.
-  ///
-  /// {@tool dartpad}
-  /// This example shows how to use a [SearchAnchor.bar] which uses a default search
-  /// bar to open a search view route.
-  ///
-  /// ** See code in examples/api/lib/material/search_anchor/search_anchor.0.dart **
-  /// {@end-tool}
-  factory SearchAnchor.bar({
-    Widget? barLeading,
-    Iterable<Widget>? barTrailing,
-    String? barHintText,
-    GestureTapCallback? onTap,
-    ValueChanged<String>? onSubmitted,
-    ValueChanged<String>? onChanged,
-    MaterialStateProperty<double?>? barElevation,
-    MaterialStateProperty<Color?>? barBackgroundColor,
-    MaterialStateProperty<Color?>? barOverlayColor,
-    MaterialStateProperty<BorderSide?>? barSide,
-    MaterialStateProperty<OutlinedBorder?>? barShape,
-    MaterialStateProperty<EdgeInsetsGeometry?>? barPadding,
-    MaterialStateProperty<TextStyle?>? barTextStyle,
-    MaterialStateProperty<TextStyle?>? barHintStyle,
-    Widget? viewLeading,
-    Iterable<Widget>? viewTrailing,
-    String? viewHintText,
-    Color? viewBackgroundColor,
-    double? viewElevation,
-    BorderSide? viewSide,
-    OutlinedBorder? viewShape,
-    TextStyle? viewHeaderTextStyle,
-    TextStyle? viewHeaderHintStyle,
-    Color? dividerColor,
-    BoxConstraints? constraints,
-    BoxConstraints? viewConstraints,
-    bool? isFullScreen,
-    SearchController searchController,
-    TextCapitalization textCapitalization,
-    required SuggestionsBuilder suggestionsBuilder,
-    TextInputAction? textInputAction,
-    TextInputType? keyboardType,
-  }) = _SearchAnchorWithSearchBar;
-
-  /// Whether the search view grows to fill the entire screen when the
-  /// [SearchAnchor] is tapped.
-  ///
-  /// By default, the search view is full-screen on mobile devices. On other
-  /// platforms, the search view only grows to a specific size that is determined
-  /// by the anchor and the default size.
   final bool? isFullScreen;
 
   /// An optional controller that allows opening and closing of the search view from
@@ -187,7 +122,7 @@ class SearchAnchor extends StatefulWidget {
   /// search view.
   ///
   /// Default view uses a [ListView] with a vertical scroll direction.
-  final ViewBuilder? viewBuilder;
+  // final ViewBuilder? viewBuilder;
 
   /// An optional widget to display before the text input field when the search
   /// view is open.
@@ -312,7 +247,9 @@ class SearchAnchor extends StatefulWidget {
   ///
   /// By default, the list returned by this builder is laid out in a [ListView].
   /// To get a different layout, use [viewBuilder] to override.
-  final SuggestionsBuilder suggestionsBuilder;
+  // final SuggestionsBuilder suggestionsBuilder;
+
+  Widget suggestions;
 
   /// {@macro flutter.widgets.TextField.textInputAction}
   final TextInputAction? textInputAction;
@@ -323,10 +260,10 @@ class SearchAnchor extends StatefulWidget {
   final TextInputType? keyboardType;
 
   @override
-  State<SearchAnchor> createState() => _SearchAnchorState();
+  State<ExposedSearchAnchor> createState() => _ExposedSearchAnchorState();
 }
 
-class _SearchAnchorState extends State<SearchAnchor> {
+class _ExposedSearchAnchorState extends State<ExposedSearchAnchor> {
   Size? _screenSize;
   bool _anchorIsVisible = true;
   final GlobalKey _anchorKey = GlobalKey();
@@ -353,7 +290,7 @@ class _SearchAnchorState extends State<SearchAnchor> {
   }
 
   @override
-  void didUpdateWidget(SearchAnchor oldWidget) {
+  void didUpdateWidget(ExposedSearchAnchor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.searchController != widget.searchController) {
       oldWidget.searchController?._detach(this);
@@ -389,10 +326,9 @@ class _SearchAnchorState extends State<SearchAnchor> {
       showFullScreenView: getShowFullScreenView(),
       toggleVisibility: toggleVisibility,
       textDirection: Directionality.of(context),
-      viewBuilder: widget.viewBuilder,
       anchorKey: _anchorKey,
       searchController: _searchController,
-      suggestionsBuilder: widget.suggestionsBuilder,
+      suggestions: widget.suggestions,
       textCapitalization: widget.textCapitalization,
       capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
       textInputAction: widget.textInputAction,
@@ -455,7 +391,6 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
     this.viewOnSubmitted,
     this.toggleVisibility,
     this.textDirection,
-    this.viewBuilder,
     this.viewLeading,
     this.viewTrailing,
     this.viewHintText,
@@ -472,7 +407,7 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
     required this.showFullScreenView,
     required this.anchorKey,
     required this.searchController,
-    required this.suggestionsBuilder,
+    required this.suggestions,
     required this.capturedThemes,
     this.textInputAction,
     this.keyboardType,
@@ -482,7 +417,6 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
   final ValueChanged<String>? viewOnSubmitted;
   final ValueGetter<bool>? toggleVisibility;
   final TextDirection? textDirection;
-  final ViewBuilder? viewBuilder;
   final Widget? viewLeading;
   final Iterable<Widget>? viewTrailing;
   final String? viewHintText;
@@ -499,7 +433,7 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
   final bool showFullScreenView;
   final GlobalKey anchorKey;
   final SearchController searchController;
-  final SuggestionsBuilder suggestionsBuilder;
+  Widget suggestions;
   final CapturedThemes capturedThemes;
   final TextInputAction? textInputAction;
   final TextInputType? keyboardType;
@@ -642,12 +576,12 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
                   topPadding: topPadding,
                   viewMaxWidth: _rectTween.end!.width,
                   viewRect: viewRect,
-                  viewBuilder: viewBuilder,
                   searchController: searchController,
-                  suggestionsBuilder: suggestionsBuilder,
+
                   textCapitalization: textCapitalization,
                   textInputAction: textInputAction,
                   keyboardType: keyboardType,
+                  suggestions: suggestions,
                 ),
               ),
             );
@@ -664,10 +598,9 @@ class _SearchViewRoute extends PopupRoute<_SearchViewRoute> {
 
 //region viewcontent
 class _ViewContent extends StatefulWidget {
-  const _ViewContent({
+  _ViewContent({
     this.viewOnChanged,
     this.viewOnSubmitted,
-    this.viewBuilder,
     this.viewLeading,
     this.viewTrailing,
     this.viewHintText,
@@ -686,14 +619,13 @@ class _ViewContent extends StatefulWidget {
     required this.viewMaxWidth,
     required this.viewRect,
     required this.searchController,
-    required this.suggestionsBuilder,
+    required this.suggestions,
     this.textInputAction,
     this.keyboardType,
   });
 
   final ValueChanged<String>? viewOnChanged;
   final ValueChanged<String>? viewOnSubmitted;
-  final ViewBuilder? viewBuilder;
   final Widget? viewLeading;
   final Iterable<Widget>? viewTrailing;
   final String? viewHintText;
@@ -711,8 +643,8 @@ class _ViewContent extends StatefulWidget {
   final Animation<double> animation;
   final double viewMaxWidth;
   final Rect viewRect;
+  Widget suggestions;
   final SearchController searchController;
-  final SuggestionsBuilder suggestionsBuilder;
   final TextInputAction? textInputAction;
   final TextInputType? keyboardType;
 
@@ -731,7 +663,6 @@ class _ViewContentState extends State<_ViewContent> {
     super.initState();
     _viewRect = widget.viewRect;
     _controller = widget.searchController;
-    _controller.addListener(updateSuggestions);
   }
 
   @override
@@ -755,35 +686,11 @@ class _ViewContentState extends State<_ViewContent> {
         _viewRect = Offset.zero & _screenSize!;
       }
     }
-    unawaited(updateSuggestions());
   }
 
   @override
   void dispose() {
-    _controller.removeListener(updateSuggestions);
     super.dispose();
-  }
-
-  Widget viewBuilder(Iterable<Widget> suggestions) {
-    if (widget.viewBuilder == null) {
-      return MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        child: ListView(
-            children: suggestions.toList()
-        ),
-      );
-    }
-    return widget.viewBuilder!(suggestions);
-  }
-
-  Future<void> updateSuggestions() async {
-    final Iterable<Widget> suggestions = await widget.suggestionsBuilder(context, _controller);
-    if (mounted) {
-      setState(() {
-        result = suggestions;
-      });
-    }
   }
 
   @override
@@ -870,7 +777,7 @@ class _ViewContentState extends State<_ViewContent> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
+                    children: [
                       Padding(
                         padding: EdgeInsets.only(top: widget.topPadding),
                         child: SafeArea(
@@ -890,7 +797,6 @@ class _ViewContentState extends State<_ViewContent> {
                             controller: _controller,
                             onChanged: (String value) {
                               widget.viewOnChanged?.call(value);
-                              updateSuggestions();
                             },
                             onSubmitted: widget.viewOnSubmitted,
                             textCapitalization: widget.textCapitalization,
@@ -913,7 +819,7 @@ class _ViewContentState extends State<_ViewContent> {
                             curve: _kViewListFadeOnInterval,
                             reverseCurve: _kViewListFadeOnInterval.flipped,
                           ),
-                          child: viewBuilder(result),
+                          child: widget.suggestions,
                         ),
                       ),
                     ],
@@ -932,80 +838,6 @@ class _ViewContentState extends State<_ViewContent> {
 
 //region searchanchor_bar
 
-class _SearchAnchorWithSearchBar extends SearchAnchor {
-  _SearchAnchorWithSearchBar({
-    Widget? barLeading,
-    Iterable<Widget>? barTrailing,
-    String? barHintText,
-    GestureTapCallback? onTap,
-    MaterialStateProperty<double?>? barElevation,
-    MaterialStateProperty<Color?>? barBackgroundColor,
-    MaterialStateProperty<Color?>? barOverlayColor,
-    MaterialStateProperty<BorderSide?>? barSide,
-    MaterialStateProperty<OutlinedBorder?>? barShape,
-    MaterialStateProperty<EdgeInsetsGeometry?>? barPadding,
-    MaterialStateProperty<TextStyle?>? barTextStyle,
-    MaterialStateProperty<TextStyle?>? barHintStyle,
-    super.viewLeading,
-    super.viewTrailing,
-    String? viewHintText,
-    super.viewBackgroundColor,
-    super.viewElevation,
-    super.viewSide,
-    super.viewShape,
-    TextStyle? viewHeaderTextStyle,
-    TextStyle? viewHeaderHintStyle,
-    super.dividerColor,
-    BoxConstraints? constraints,
-    super.viewConstraints,
-    super.isFullScreen,
-    super.searchController,
-    super.textCapitalization,
-    ValueChanged<String>? onChanged,
-    ValueChanged<String>? onSubmitted,
-    required super.suggestionsBuilder,
-    super.textInputAction,
-    super.keyboardType,
-  }) : super(
-      viewHintText: viewHintText ?? barHintText,
-      headerTextStyle: viewHeaderTextStyle,
-      headerHintStyle: viewHeaderHintStyle,
-      viewOnSubmitted: onSubmitted,
-      viewOnChanged: onChanged,
-      builder: (BuildContext context, SearchController controller) {
-        return SearchBar(
-          constraints: constraints,
-          controller: controller,
-          onTap: () {
-            controller.openView();
-            onTap?.call();
-          },
-          onChanged: (String value) {
-            controller.openView();
-          },
-          onSubmitted: onSubmitted,
-          hintText: barHintText,
-          hintStyle: barHintStyle,
-          textStyle: barTextStyle,
-          elevation: barElevation,
-          backgroundColor: barBackgroundColor,
-          overlayColor: barOverlayColor,
-          side: barSide,
-          shape: barShape,
-          padding: barPadding ?? const MaterialStatePropertyAll<EdgeInsets>(EdgeInsets.symmetric(horizontal: 16.0)),
-          leading: barLeading ?? const Icon(Icons.search),
-          trailing: barTrailing,
-          textCapitalization: textCapitalization,
-          textInputAction: textInputAction,
-          keyboardType: keyboardType,
-        );
-      }
-  );
-}
-
-//endregion searchbar
-
-//region searchcontroller
 
 /// A controller to manage a search view created by [SearchAnchor].
 ///
@@ -1022,7 +854,7 @@ class SearchController extends TextEditingController {
   //
   // This is set automatically when a [SearchController] is given to the anchor
   // it controls.
-  _SearchAnchorState? _anchor;
+  _ExposedSearchAnchorState? _anchor;
 
   /// Whether this controller has associated search anchor.
   bool get isAttached => _anchor != null;
@@ -1049,439 +881,21 @@ class SearchController extends TextEditingController {
   }
 
   // ignore: use_setters_to_change_properties
-  void _attach(_SearchAnchorState anchor) {
+  void _attach(_ExposedSearchAnchorState anchor) {
     _anchor = anchor;
   }
 
-  void _detach(_SearchAnchorState anchor) {
+  void _detach(_ExposedSearchAnchorState anchor) {
     if (_anchor == anchor) {
       _anchor = null;
     }
   }
 }
-//endregion
 
-//region searchbar
-/// A Material Design search bar.
-///
-/// A [SearchBar] looks like a [TextField]. Tapping a SearchBar typically shows a
-/// "search view" route: a route with the search bar at the top and a list of
-/// suggested completions for the search bar's text below. [SearchBar]s are
-/// usually created by a [SearchAnchor.builder]. The builder provides a
-/// [SearchController] that's used by the search bar's [SearchBar.onTap] or
-/// [SearchBar.onChanged] callbacks to show the search view and to hide it
-/// when the user selects a suggestion.
-///
-/// For [TextDirection.ltr], the [leading] widget is on the left side of the bar.
-/// It should contain either a navigational action (such as a menu or up-arrow)
-/// or a non-functional search icon.
-///
-/// The [trailing] is an optional list that appears at the other end of
-/// the search bar. Typically only one or two action icons are included.
-/// These actions can represent additional modes of searching (like voice search),
-/// a separate high-level action (such as current location) or an overflow menu.
-///
-/// {@tool dartpad}
-/// This example demonstrates how to use a [SearchBar] as the return value of the
-/// [SearchAnchor.builder] property. The [SearchBar] also includes a leading search
-/// icon and a trailing action to toggle the brightness.
-///
-/// ** See code in examples/api/lib/material/search_anchor/search_bar.0.dart **
-/// {@end-tool}
-///
-/// See also:
-///
-/// * [SearchAnchor], a widget that typically uses an [IconButton] or a [SearchBar]
-/// to manage a "search view" route.
-/// * [SearchBarTheme], a widget that overrides the default configuration of a search bar.
-/// * [SearchViewTheme], a widget that overrides the default configuration of a search view.
-class SearchBar extends StatefulWidget {
-  /// Creates a Material Design search bar.
-  const SearchBar({
-    super.key,
-    this.controller,
-    this.focusNode,
-    this.hintText,
-    this.leading,
-    this.trailing,
-    this.onTap,
-    this.onChanged,
-    this.onSubmitted,
-    this.constraints,
-    this.elevation,
-    this.backgroundColor,
-    this.shadowColor,
-    this.surfaceTintColor,
-    this.overlayColor,
-    this.side,
-    this.shape,
-    this.padding,
-    this.textStyle,
-    this.hintStyle,
-    this.textCapitalization,
-    this.autoFocus = false,
-    this.textInputAction,
-    this.keyboardType,
-  });
-
-  /// Controls the text being edited in the search bar's text field.
-  ///
-  /// If null, this widget will create its own [TextEditingController].
-  final TextEditingController? controller;
-
-  /// {@macro flutter.widgets.Focus.focusNode}
-  final FocusNode? focusNode;
-
-  /// Text that suggests what sort of input the field accepts.
-  ///
-  /// Displayed at the same location on the screen where text may be entered
-  /// when the input is empty.
-  ///
-  /// Defaults to null.
-  final String? hintText;
-
-  /// A widget to display before the text input field.
-  ///
-  /// Typically the [leading] widget is an [Icon] or an [IconButton].
-  final Widget? leading;
-
-  /// A list of Widgets to display in a row after the text field.
-  ///
-  /// Typically these actions can represent additional modes of searching
-  /// (like voice search), an avatar, a separate high-level action (such as
-  /// current location) or an overflow menu. There should not be more than
-  /// two trailing actions.
-  final Iterable<Widget>? trailing;
-
-  /// Called when the user taps this search bar.
-  final GestureTapCallback? onTap;
-
-  /// Invoked upon user input.
-  final ValueChanged<String>? onChanged;
-
-  /// Called when the user indicates that they are done editing the text in the
-  /// field.
-  final ValueChanged<String>? onSubmitted;
-
-  /// Optional size constraints for the search bar.
-  ///
-  /// If null, the value of [SearchBarThemeData.constraints] will be used. If
-  /// this is also null, then the constraints defaults to:
-  /// ```dart
-  /// const BoxConstraints(minWidth: 360.0, maxWidth: 800.0, minHeight: 56.0)
-  /// ```
-  final BoxConstraints? constraints;
-
-  /// The elevation of the search bar's [Material].
-  ///
-  /// If null, the value of [SearchBarThemeData.elevation] will be used. If this
-  /// is also null, then default value is 6.0.
-  final MaterialStateProperty<double?>? elevation;
-
-  /// The search bar's background fill color.
-  ///
-  /// If null, the value of [SearchBarThemeData.backgroundColor] will be used.
-  /// If this is also null, then the default value is [ColorScheme.surface].
-  final MaterialStateProperty<Color?>? backgroundColor;
-
-  /// The shadow color of the search bar's [Material].
-  ///
-  /// If null, the value of [SearchBarThemeData.shadowColor] will be used.
-  /// If this is also null, then the default value is [ColorScheme.shadow].
-  final MaterialStateProperty<Color?>? shadowColor;
-
-  /// The surface tint color of the search bar's [Material].
-  ///
-  /// See [Material.surfaceTintColor] for more details.
-  ///
-  /// If null, the value of [SearchBarThemeData.surfaceTintColor] will be used.
-  /// If this is also null, then the default value is [ColorScheme.surfaceTint].
-  final MaterialStateProperty<Color?>? surfaceTintColor;
-
-  /// The highlight color that's typically used to indicate that
-  /// the search bar is focused, hovered, or pressed.
-  final MaterialStateProperty<Color?>? overlayColor;
-
-  /// The color and weight of the search bar's outline.
-  ///
-  /// This value is combined with [shape] to create a shape decorated
-  /// with an outline.
-  ///
-  /// If null, the value of [SearchBarThemeData.side] will be used. If this is
-  /// also null, the search bar doesn't have a side by default.
-  final MaterialStateProperty<BorderSide?>? side;
-
-  /// The shape of the search bar's underlying [Material].
-  ///
-  /// This shape is combined with [side] to create a shape decorated
-  /// with an outline.
-  ///
-  /// If null, the value of [SearchBarThemeData.shape] will be used.
-  /// If this is also null, defaults to [StadiumBorder].
-  final MaterialStateProperty<OutlinedBorder?>? shape;
-
-  /// The padding between the search bar's boundary and its contents.
-  ///
-  /// If null, the value of [SearchBarThemeData.padding] will be used.
-  /// If this is also null, then the default value is 16.0 horizontally.
-  final MaterialStateProperty<EdgeInsetsGeometry?>? padding;
-
-  /// The style to use for the text being edited.
-  ///
-  /// If null, defaults to the `bodyLarge` text style from the current [Theme].
-  /// The default text color is [ColorScheme.onSurface].
-  final MaterialStateProperty<TextStyle?>? textStyle;
-
-  /// The style to use for the [hintText].
-  ///
-  /// If null, the value of [SearchBarThemeData.hintStyle] will be used. If this
-  /// is also null, the value of [textStyle] will be used. If this is also null,
-  /// defaults to the `bodyLarge` text style from the current [Theme].
-  /// The default text color is [ColorScheme.onSurfaceVariant].
-  final MaterialStateProperty<TextStyle?>? hintStyle;
-
-  /// {@macro flutter.widgets.editableText.textCapitalization}
-  final TextCapitalization? textCapitalization;
-
-  /// {@macro flutter.widgets.editableText.autofocus}
-  final bool autoFocus;
-
-  /// {@macro flutter.widgets.TextField.textInputAction}
-  final TextInputAction? textInputAction;
-
-  /// The type of action button to use for the keyboard.
-  ///
-  /// Defaults to the default value specified in [TextField].
-  final TextInputType? keyboardType;
-
-  @override
-  State<SearchBar> createState() => _SearchBarState();
-}
-
-class _SearchBarState extends State<SearchBar> {
-  late final MaterialStatesController _internalStatesController;
-  FocusNode? _internalFocusNode;
-  FocusNode get _focusNode => widget.focusNode ?? (_internalFocusNode ??= FocusNode());
-
-  @override
-  void initState() {
-    super.initState();
-    _internalStatesController = MaterialStatesController();
-    _internalStatesController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _internalStatesController.dispose();
-    _internalFocusNode?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final TextDirection textDirection = Directionality.of(context);
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final IconThemeData iconTheme = IconTheme.of(context);
-    final SearchBarThemeData searchBarTheme = SearchBarTheme.of(context);
-    final SearchBarThemeData defaults = _SearchBarDefaultsM3(context);
-
-    T? resolve<T>(
-        MaterialStateProperty<T>? widgetValue,
-        MaterialStateProperty<T>? themeValue,
-        MaterialStateProperty<T>? defaultValue,
-        ) {
-      final Set<MaterialState> states = _internalStatesController.value;
-      return widgetValue?.resolve(states) ?? themeValue?.resolve(states) ?? defaultValue?.resolve(states);
-    }
-
-    final TextStyle? effectiveTextStyle = resolve<TextStyle?>(widget.textStyle, searchBarTheme.textStyle, defaults.textStyle);
-    final double? effectiveElevation = resolve<double?>(widget.elevation, searchBarTheme.elevation, defaults.elevation);
-    final Color? effectiveShadowColor = resolve<Color?>(widget.shadowColor, searchBarTheme.shadowColor, defaults.shadowColor);
-    final Color? effectiveBackgroundColor = resolve<Color?>(widget.backgroundColor, searchBarTheme.backgroundColor, defaults.backgroundColor);
-    final Color? effectiveSurfaceTintColor = resolve<Color?>(widget.surfaceTintColor, searchBarTheme.surfaceTintColor, defaults.surfaceTintColor);
-    final OutlinedBorder? effectiveShape = resolve<OutlinedBorder?>(widget.shape, searchBarTheme.shape, defaults.shape);
-    final BorderSide? effectiveSide = resolve<BorderSide?>(widget.side, searchBarTheme.side, defaults.side);
-    final EdgeInsetsGeometry? effectivePadding = resolve<EdgeInsetsGeometry?>(widget.padding, searchBarTheme.padding, defaults.padding);
-    final MaterialStateProperty<Color?>? effectiveOverlayColor = widget.overlayColor ?? searchBarTheme.overlayColor ?? defaults.overlayColor;
-    final TextCapitalization effectiveTextCapitalization = widget.textCapitalization ?? searchBarTheme.textCapitalization ?? defaults.textCapitalization!;
-
-    final Set<MaterialState> states = _internalStatesController.value;
-    final TextStyle? effectiveHintStyle = widget.hintStyle?.resolve(states)
-        ?? searchBarTheme.hintStyle?.resolve(states)
-        ?? widget.textStyle?.resolve(states)
-        ?? searchBarTheme.textStyle?.resolve(states)
-        ?? defaults.hintStyle?.resolve(states);
-
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    bool isIconThemeColorDefault(Color? color) {
-      if (isDark) {
-        return color == kDefaultIconLightColor;
-      }
-      return color == kDefaultIconDarkColor;
-    }
-
-    Widget? leading;
-    if (widget.leading != null) {
-      leading = IconTheme.merge(
-        data: isIconThemeColorDefault(iconTheme.color)
-            ? IconThemeData(color: colorScheme.onSurface)
-            : iconTheme,
-        child: widget.leading!,
-      );
-    }
-
-    List<Widget>? trailing;
-    if (widget.trailing != null) {
-      trailing = widget.trailing?.map((Widget trailing) => IconTheme.merge(
-        data: isIconThemeColorDefault(iconTheme.color)
-            ? IconThemeData(color: colorScheme.onSurfaceVariant)
-            : iconTheme,
-        child: trailing,
-      )).toList();
-    }
-
-    return ConstrainedBox(
-      constraints: widget.constraints ?? searchBarTheme.constraints ?? defaults.constraints!,
-      child: Material(
-        elevation: effectiveElevation!,
-        shadowColor: effectiveShadowColor,
-        color: effectiveBackgroundColor,
-        surfaceTintColor: effectiveSurfaceTintColor,
-        shape: effectiveShape?.copyWith(side: effectiveSide),
-        child: InkWell(
-          onTap: () {
-            widget.onTap?.call();
-            if (!_focusNode.hasFocus) {
-              _focusNode.requestFocus();
-            }
-          },
-          overlayColor: effectiveOverlayColor,
-          customBorder: effectiveShape?.copyWith(side: effectiveSide),
-          statesController: _internalStatesController,
-          child: Padding(
-            padding: effectivePadding!,
-            child: Row(
-              textDirection: textDirection,
-              children: <Widget>[
-                if (leading != null) leading,
-                Expanded(
-                  child: Padding(
-                    padding: effectivePadding,
-                    child: TextField(
-                      autofocus: widget.autoFocus,
-                      onTap: widget.onTap,
-                      onTapAlwaysCalled: true,
-                      focusNode: _focusNode,
-                      onChanged: widget.onChanged,
-                      onSubmitted: widget.onSubmitted,
-                      controller: widget.controller,
-                      style: effectiveTextStyle,
-                      decoration: InputDecoration(
-                        hintText: widget.hintText,
-                      ).applyDefaults(InputDecorationTheme(
-                        hintStyle: effectiveHintStyle,
-                        // The configuration below is to make sure that the text field
-                        // in `SearchBar` will not be overridden by the overall `InputDecorationTheme`
-                        enabledBorder: InputBorder.none,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                        // Setting `isDense` to true to allow the text field height to be
-                        // smaller than 48.0
-                        isDense: true,
-                      )),
-                      textCapitalization: effectiveTextCapitalization,
-                      textInputAction: widget.textInputAction,
-                      keyboardType: widget.keyboardType,
-                    ),
-                  ),
-                ),
-                if (trailing != null) ...trailing,
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// BEGIN GENERATED TOKEN PROPERTIES - SearchBar
-
-// Do not edit by hand. The code between the "BEGIN GENERATED" and
-// "END GENERATED" comments are generated from data in the Material
-// Design token database by the script:
-//   dev/tools/gen_defaults/bin/gen_defaults.dart.
 //endregion searchbar
 
 //region defaults
-class _SearchBarDefaultsM3 extends SearchBarThemeData {
-  _SearchBarDefaultsM3(this.context);
 
-  final BuildContext context;
-  late final ColorScheme _colors = Theme.of(context).colorScheme;
-  late final TextTheme _textTheme = Theme.of(context).textTheme;
-
-  @override
-  MaterialStateProperty<Color?>? get backgroundColor =>
-      MaterialStatePropertyAll<Color>(_colors.surface);
-
-  @override
-  MaterialStateProperty<double>? get elevation =>
-      const MaterialStatePropertyAll<double>(6.0);
-
-  @override
-  MaterialStateProperty<Color>? get shadowColor =>
-      MaterialStatePropertyAll<Color>(_colors.shadow);
-
-  @override
-  MaterialStateProperty<Color>? get surfaceTintColor =>
-      MaterialStatePropertyAll<Color>(_colors.surfaceTint);
-
-  @override
-  MaterialStateProperty<Color?>? get overlayColor =>
-      MaterialStateProperty.resolveWith((Set<MaterialState> states) {
-        if (states.contains(MaterialState.pressed)) {
-          return _colors.onSurface.withOpacity(0.12);
-        }
-        if (states.contains(MaterialState.hovered)) {
-          return _colors.onSurface.withOpacity(0.08);
-        }
-        if (states.contains(MaterialState.focused)) {
-          return Colors.transparent;
-        }
-        return Colors.transparent;
-      });
-
-  // No default side
-
-  @override
-  MaterialStateProperty<OutlinedBorder>? get shape =>
-      const MaterialStatePropertyAll<OutlinedBorder>(StadiumBorder());
-
-  @override
-  MaterialStateProperty<EdgeInsetsGeometry>? get padding =>
-      const MaterialStatePropertyAll<EdgeInsetsGeometry>(EdgeInsets.symmetric(horizontal: 8.0));
-
-  @override
-  MaterialStateProperty<TextStyle?> get textStyle =>
-      MaterialStatePropertyAll<TextStyle?>(_textTheme.bodyLarge?.copyWith(color: _colors.onSurface));
-
-  @override
-  MaterialStateProperty<TextStyle?> get hintStyle =>
-      MaterialStatePropertyAll<TextStyle?>(_textTheme.bodyLarge?.copyWith(color: _colors.onSurfaceVariant));
-
-  @override
-  BoxConstraints get constraints =>
-      const BoxConstraints(minWidth: 360.0, maxWidth: 800.0, minHeight: 56.0);
-
-  @override
-  TextCapitalization get textCapitalization => TextCapitalization.none;
-}
-
-// END GENERATED TOKEN PROPERTIES - SearchBar
 
 // BEGIN GENERATED TOKEN PROPERTIES - SearchView
 
