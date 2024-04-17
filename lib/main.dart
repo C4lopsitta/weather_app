@@ -3,6 +3,8 @@ import 'package:weather_app/pages/current_weather.dart';
 import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
 
+import 'geo.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -32,10 +34,10 @@ class ApplicationRoot extends StatefulWidget {
 class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
 
+
+
   @override
   Widget build(BuildContext context) {
-    // Weather_api w = new Weather_api();
-    // print(w.call_api());
     return Scaffold(
       body: [
           CurrentWeather(),
