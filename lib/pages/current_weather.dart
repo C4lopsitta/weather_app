@@ -12,12 +12,17 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
+  Geo? _selectedGeo = null;
+  BuildContext? sheetContext = null;
   
   void _openSheet() {
     if(_searchTextController.text.isNotEmpty) {
       showModalBottomSheet(
           context: context,
+          showDragHandle: true,
+          enableDrag: true,
           builder: (context) {
+            sheetContext = context;
             return SizedBox(
                 child: Padding(
                   padding: const EdgeInsets.all(12),
@@ -32,7 +37,10 @@ class _CurrentWeather extends State<CurrentWeather> {
                           children: [
                             Text("Suggestions"),
                             IconButton(
-                                onPressed: () => Navigator.pop(context),
+                                onPressed: () {
+                                  sheetContext = null;
+                                  Navigator.pop(context);
+                                },
                                 icon: Icon(Icons.close_rounded)
                             )
                           ],
@@ -61,6 +69,11 @@ class _CurrentWeather extends State<CurrentWeather> {
           subtitle: Text(geo.fullName ?? ""),
           onTap: () {
             Geo self = geo;
+            setState(() {
+              _selectedGeo = self;
+              if(geo.city != null) _searchTextController.text = geo.city!;
+            });
+            if(sheetContext != null) Navigator.pop(sheetContext!);
           },
         ));
       });
@@ -69,9 +82,10 @@ class _CurrentWeather extends State<CurrentWeather> {
         suggestions = liveSuggestions;
       });
     });
-    setState(() {
+  }
 
-    });
+  Future _getWeatherForSelectedGeo() async {
+
   }
 
   final TextEditingController _searchTextController = TextEditingController();
@@ -103,6 +117,10 @@ class _CurrentWeather extends State<CurrentWeather> {
                     _getSuggestions(text).then((value) => _openSheet());
                   },
                 ) ],
+                leading: IconButton(
+                  icon: Icon(Icons.location_on_rounded),
+                  onPressed: () {  },
+                ),
               )
             ],
           ),
