@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/apis/geo.dart';
+import 'package:weather_app/apis/geo.dart' as Geo;
 import 'package:weather_app/apis/Weather_api.dart';
 
 class CurrentWeather extends StatefulWidget {
@@ -13,8 +13,9 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
-  Geo? _selectedGeo = null;
+  Geo.Geo? _selectedGeo = null;
   BuildContext? sheetContext = null;
+  bool _isGettingLocation = false;
   
   void _openSheet() {
     if(_searchTextController.text.isNotEmpty) {
@@ -62,14 +63,14 @@ class _CurrentWeather extends State<CurrentWeather> {
   Future _getSuggestions(String searchKey) async {
     List<ListTile> liveSuggestions = [];
 
-    await geocodeLocation(searchKey).then((geos) {
+    await Geo.geocodeLocation(searchKey).then((geos) {
       geos?.forEach((geo) {
         print(geo.toString());
         liveSuggestions.add(ListTile(
           title: Text(geo.city ?? "UNDEFINED"),
           subtitle: Text(geo.fullName ?? ""),
           onTap: () {
-            Geo self = geo;
+            Geo.Geo self = geo;
             setState(() {
               _selectedGeo = self;
               if(geo.city != null) _searchTextController.text = geo.city!;
@@ -84,6 +85,20 @@ class _CurrentWeather extends State<CurrentWeather> {
       setState(() {
         suggestions = liveSuggestions;
       });
+    });
+  }
+
+  Future _geocodeCurrentLocation() async {
+    setState(() {
+      _isGettingLocation = true;
+    });
+    Geo.Geo current = await Geo.getLocation();
+    current = await Geo.geocodeCurrentLocation(current);
+
+    setState(() {
+      if(current.city != null) _searchTextController.text = current.city!;
+      _isGettingLocation = false;
+      _selectedGeo = current;
     });
   }
 
@@ -123,10 +138,18 @@ class _CurrentWeather extends State<CurrentWeather> {
                     _getSuggestions(text).then((value) => _openSheet());
                   },
                 ) ],
-                leading: IconButton(
-                  icon: Icon(Icons.location_on_rounded),
-                  onPressed: () {  },
-                ),
+                leading: (_isGettingLocation) ?
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator()
+                    )
+                  ) : IconButton(
+                    icon: Icon(Icons.location_on_rounded),
+                    onPressed: () => _geocodeCurrentLocation(),
+                  ),
               )
             ],
           ),

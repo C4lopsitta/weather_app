@@ -7,15 +7,16 @@ import 'package:weather_app/exceptions/geo_exception.dart';
 
 const String _nominatimURL = "nominatim.openstreetmap.org";
 const String _nominatimSearch = "/search";
+const String _nominatimReverse = "/reverse";
 
 
 class Geo {
   Geo(this.lat, this.lon, {this.city, this.fullName});
 
-  final double lat;
-  final double lon;
-  final String? city;
-  final String? fullName;
+  double lat;
+  double lon;
+  String? city;
+  String? fullName;
 
   String toString() {
     return "GEO: {lat: $lat, lon: $lon, city: $city, fullName: $fullName}";
@@ -72,4 +73,26 @@ Future<List<Geo>?> geocodeLocation(String location) async {
   return (geocodes.isEmpty) ? null : geocodes;
 }
 
+Future<Geo> geocodeCurrentLocation(Geo current) async {
+  Map<String, String> params = {
+    "format": "geojson",
+    "lat": "${current.lat}",
+    "lon": "${current.lon}",
+    "zoom": "12"
+  };
+  Uri uri = Uri.https(_nominatimURL, _nominatimReverse, params);
+
+  await http.get(uri).then((response) {
+    dynamic feature = jsonDecode(response.body)["features"][0];
+
+    List<dynamic> coords = feature["geometry"]["coordinates"];
+
+    current.lat = coords[0];
+    current.lon = coords[1];
+    current.city = feature["properties"]["name"] ?? "UNDEFINED";
+    current.fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
+  });
+
+  return current;
+}
 
