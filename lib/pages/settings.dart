@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/geo.dart';
+import 'package:weather_app/apis/geo.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
