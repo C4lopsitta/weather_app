@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/geo.dart';
+import 'package:weather_app/apis/geo.dart';
+import 'package:weather_app/apis/Weather_api.dart';
 
 class CurrentWeather extends StatefulWidget {
   const CurrentWeather({super.key});
@@ -74,6 +75,8 @@ class _CurrentWeather extends State<CurrentWeather> {
               if(geo.city != null) _searchTextController.text = geo.city!;
             });
             if(sheetContext != null) Navigator.pop(sheetContext!);
+
+            //call get weather (current)
           },
         ));
       });
@@ -85,7 +88,9 @@ class _CurrentWeather extends State<CurrentWeather> {
   }
 
   Future _getWeatherForSelectedGeo() async {
-
+    if(_selectedGeo == null) return;
+    Weather_api current = Weather_api.from_geo(_selectedGeo!);
+    current.call_api();
   }
 
   final TextEditingController _searchTextController = TextEditingController();
