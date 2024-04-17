@@ -1,41 +1,82 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/enums/search_status.dart';
 import 'package:weather_app/geo.dart';
 
 class CurrentWeather extends StatefulWidget {
+  const CurrentWeather({super.key});
+
   @override
   State<StatefulWidget> createState() => _CurrentWeather();
 }
 
 class _CurrentWeather extends State<CurrentWeather> {
-  Future _getSuggestions(SearchController controller, String searchKey) async {
-    List<Widget> suggestions = [];
+  List<Widget> suggestions = [];
+  
+  void _openSheet() {
+    if(_searchTextController.text.isNotEmpty) {
+      showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Suggestions"),
+                            IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: Icon(Icons.close_rounded)
+                            )
+                          ],
+                        )
+                      ),
+                      SingleChildScrollView( child: Column(
+                        children: suggestions,
+                      )),
+                    ]
+                  ),
+                )
+            );
+          }
+      );
+    }
+  }
+
+  Future _getSuggestions(String searchKey) async {
+    List<ListTile> liveSuggestions = [];
 
     await geocodeLocation(searchKey).then((geos) {
       geos?.forEach((geo) {
         print(geo.toString());
-        suggestions.add(ListTile(
+        liveSuggestions.add(ListTile(
           title: Text(geo.city ?? "UNDEFINED"),
           subtitle: Text(geo.fullName ?? ""),
           onTap: () {
             Geo self = geo;
-            controller.closeView(geo.city);
           },
         ));
       });
 
-      print("\n\nSetting state!\n${suggestions.length}\n");
       setState(() {
-        _suggestionSet = suggestions;
+        suggestions = liveSuggestions;
       });
+    });
+    setState(() {
+
     });
   }
 
-  final SearchController _searchController = SearchController();
   final TextEditingController _searchTextController = TextEditingController();
-  List<Widget> _suggestionSet = [ ];
+
+  String _iDunnoMan = "initial";
 
   @override
   Widget build(BuildContext context) {
@@ -50,28 +91,19 @@ class _CurrentWeather extends State<CurrentWeather> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SearchAnchor(
-                searchController: _searchController,
-                isFullScreen: false,
-                builder: (context, controller) =>
-                  SearchBar(
-                    controller: _searchTextController,
-                    onTap: () { _searchController.openView(); },
-                  ),
-                viewOnSubmitted: (searchKey) {
-                  if(searchKey.isEmpty) return;
-                  _getSuggestions(_searchController, searchKey);
+              SearchBar(
+                controller: _searchTextController,
+                onSubmitted: (text) {
+                  _getSuggestions(text).then((value) => _openSheet());
                 },
-
-                viewBuilder: (set) {
-                  _getSuggestions(_searchController, _searchTextController.text);
-                  return SingleChildScrollView(child: Column(children: set.toList()));
-                },
-                suggestionsBuilder: (_, __) async {
-                  return _suggestionSet;
-                },
+                trailing: [ IconButton(
+                  icon: Icon(Icons.search_rounded),
+                  onPressed: () {
+                    String text = _searchTextController.text;
+                    _getSuggestions(text).then((value) => _openSheet());
+                  },
+                ) ],
               )
-
             ],
           ),
         ),
@@ -79,3 +111,6 @@ class _CurrentWeather extends State<CurrentWeather> {
     );
   }
 }
+
+//TODO)) Modify state to be inside the searchbar and give function that updates
+//TODO)) State to given item once updated
