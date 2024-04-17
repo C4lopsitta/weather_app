@@ -48,9 +48,13 @@ class _CurrentWeather extends State<CurrentWeather> {
                           ],
                         )
                       ),
-                      SingleChildScrollView( child: Column(
-                        children: suggestions,
-                      )),
+                      Expanded( child: SingleChildScrollView(
+                        clipBehavior: Clip.hardEdge,
+                        scrollDirection: Axis.vertical,
+                        child: Expanded(
+                            child: Column(
+                            children: suggestions,
+                      )))),
                     ]
                   ),
                 )
@@ -92,14 +96,21 @@ class _CurrentWeather extends State<CurrentWeather> {
     setState(() {
       _isGettingLocation = true;
     });
-    Geo.Geo current = await Geo.getLocation();
-    current = await Geo.geocodeCurrentLocation(current);
+    try {
+      Geo.Geo current = await Geo.getLocation();
+      current = await Geo.geocodeCurrentLocation(current);
 
-    setState(() {
-      if(current.city != null) _searchTextController.text = current.city!;
-      _isGettingLocation = false;
-      _selectedGeo = current;
-    });
+      setState(() {
+        if(current.city != null) _searchTextController.text = current.city!;
+        _isGettingLocation = false;
+        _selectedGeo = current;
+      });
+
+    } catch(exception) {
+      print(exception.toString());
+    }
+
+
   }
 
   Future _getWeatherForSelectedGeo() async {
@@ -147,7 +158,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                       child: CircularProgressIndicator()
                     )
                   ) : IconButton(
-                    icon: Icon(Icons.location_on_rounded),
+                    icon: const Icon(Icons.location_on_rounded),
                     onPressed: () => _geocodeCurrentLocation(),
                   ),
               )
