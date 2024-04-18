@@ -17,7 +17,7 @@ class Current {
       json["current"]["temperature_2m"],
       json["current"]["apparent_temperature"],
       json["current"]["wind_speed_10m"],
-      "$json['current']['wind_direction_10m']",
+      "${json['current']['wind_direction_10m']}",
       json["current"]["weather_code"],
       json["current"]["precipitation"],
       json["current"]["relative_humidity_2m"],
