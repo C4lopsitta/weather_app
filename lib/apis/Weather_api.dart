@@ -7,8 +7,7 @@ import 'geo.dart';
 class Weather_api{
 
   final String _api_url = "api.open-meteo.com";
-  double _latitude = 44.59703140;
-  double _longitude = 7.61142170;
+  Geo geo = new Geo(44.59703140, 7.61142170);   //Cuneo coordinates
   Weather_api();
 
 
@@ -16,27 +15,15 @@ class Weather_api{
 
   factory Weather_api.from_geo(Geo geo) {
     Weather_api w = Weather_api();
-    w.latitude = geo.lat;
-    w.longitude = geo.lon;
+    w.geo = geo;
     return w;
-  }
-
-  factory Weather_api.from_lat_lon(double latitude, double longitude){
-    Weather_api w = Weather_api();
-    w._latitude = latitude;
-    w._longitude = longitude;
-    return w;
-  }
-
-  String toString(){
-    return "url: $api_url, latitude: $_latitude, longitude: $_longitude";
   }
 
   Map<String, dynamic>? call_api(){
     const path = "/v1/forecast";
     Map<String, dynamic> params = {
-      "longitude":_longitude,
-      "latitude": _latitude,
+      "longitude":geo.lon,
+      "latitude": geo.lat,
 
       "current": "temperature_2m,relative_humidity_2m,apparent_temperature,"
         "precipitation,weather_code,wind_speed_10m,wind_direction_10m",
@@ -54,17 +41,5 @@ class Weather_api{
         }
     );
     return null;
-  }
-
-  double get latitude => _latitude;
-
-  set latitude(double value) {
-    _latitude = value;
-  }
-
-  double get longitude => _longitude;
-
-  set longitude(double value) {
-    _longitude = value;
   }
 }
