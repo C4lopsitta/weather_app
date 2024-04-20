@@ -1,4 +1,3 @@
-
 class Current {
 
   final double temperature;
@@ -15,11 +14,11 @@ class Current {
 
     Current c = Current(
       json["current"]["temperature_2m"],
-      json["current"]["apparent_temperature"],
-      json["current"]["wind_speed_10m"],
-      "${json['current']['wind_direction_10m']}",
+      json["current"]["apparent_temperature"]??0,
+      json["current"]["wind_speed_10m"]??0,
+      "${json['current']['wind_direction_10m']??0}",
       json["current"]["weather_code"],
-      json["current"]["precipitation"],
+      json["current"]["precipitation"]??0,
       json["current"]["relative_humidity_2m"],
     );
 

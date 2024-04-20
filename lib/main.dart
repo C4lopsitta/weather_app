@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/apis/Weather_api.dart';
 import 'package:weather_app/pages/current_weather.dart';
 import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
 
 import 'apis/geo.dart';
+import 'forecast/Current.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,9 +35,6 @@ class ApplicationRoot extends StatefulWidget {
 
 class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

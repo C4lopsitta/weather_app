@@ -115,9 +115,8 @@ class _CurrentWeather extends State<CurrentWeather> {
 
   Future _getWeatherForSelectedGeo() async {
     if(_selectedGeo == null) return;
-    Weather_api current = Weather_api.from_geo(_selectedGeo!);
-    current.call_api();
-
+    Weather_api current = Weather_api(geo: _selectedGeo!);
+    current.call_api_current();
   }
 
   final TextEditingController _searchTextController = TextEditingController();
