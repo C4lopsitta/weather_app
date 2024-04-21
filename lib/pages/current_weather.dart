@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:weather_app/apis/geo.dart' as Geo;
 import 'package:weather_app/apis/Weather_api.dart';
+import 'package:weather_app/components/weather_header.dart';
+import 'package:weather_app/components/weather_hourly_card.dart';
+
+import '../forecast/Hourly.dart';
 
 class CurrentWeather extends StatefulWidget {
   const CurrentWeather({super.key});
@@ -121,8 +125,6 @@ class _CurrentWeather extends State<CurrentWeather> {
 
   final TextEditingController _searchTextController = TextEditingController();
 
-  String _iDunnoMan = "initial";
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -160,14 +162,33 @@ class _CurrentWeather extends State<CurrentWeather> {
                     icon: const Icon(Icons.location_on_rounded),
                     onPressed: () => _geocodeCurrentLocation(),
                   ),
-              )
-            ],
+              ),
+              if(_selectedGeo != null)
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      WeatherHeader(
+                        city: _selectedGeo!.city,
+                        weatherDescription: null,
+                        temperature: 21.2,
+                        minTemp: 14,
+                        maxTemp: 23,
+                        perceivedTemp: 20
+                      ),
+                      HourlyWeatherCard(hourly: Hourly(
+                        ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"],
+                        [20, 19, 15, 14, 14, 13, 12],
+                        [66, 50, 44, 30, 33, 37, 29],
+                        [1, 2, 3, 2, 2, 2],
+                        [43, 12, 1, 2, 1, 4]
+                      ))
+                    ]
+                  )
+                ),
+              ],
           ),
         ),
       ],
     );
   }
 }
-
-//TODO)) Modify state to be inside the searchbar and give function that updates
-//TODO)) State to given item once updated

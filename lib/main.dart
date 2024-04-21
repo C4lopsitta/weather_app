@@ -35,6 +35,7 @@ class ApplicationRoot extends StatefulWidget {
 
 class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
