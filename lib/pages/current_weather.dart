@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/apis/geo.dart' as Geo;
+import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/Weather_api.dart';
 
 class CurrentWeather extends StatefulWidget {
@@ -13,7 +13,7 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
-  Geo.Geo? _selectedGeo = null;
+  Geo? _selectedGeo = null;
   BuildContext? sheetContext = null;
   bool _isGettingLocation = false;
   
@@ -26,6 +26,7 @@ class _CurrentWeather extends State<CurrentWeather> {
           builder: (context) {
             sheetContext = context;
             return SizedBox(
+              height: MediaQuery.sizeOf(context).height,
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
@@ -48,13 +49,13 @@ class _CurrentWeather extends State<CurrentWeather> {
                           ],
                         )
                       ),
-                      Expanded( child: SingleChildScrollView(
+                      SizedBox(
+                        height: MediaQuery.sizeOf(context).height * 0.4,
+                        child: SingleChildScrollView(
                         clipBehavior: Clip.hardEdge,
                         scrollDirection: Axis.vertical,
-                        child: Expanded(
-                            child: Column(
-                            children: suggestions,
-                      )))),
+                        child: Column( children: suggestions )
+                      )),
                     ]
                   ),
                 )
@@ -74,7 +75,7 @@ class _CurrentWeather extends State<CurrentWeather> {
           title: Text(geo.city ?? "UNDEFINED"),
           subtitle: Text(geo.fullName ?? ""),
           onTap: () {
-            Geo.Geo self = geo;
+            Geo self = geo;
             setState(() {
               _selectedGeo = self;
               if(geo.city != null) _searchTextController.text = geo.city!;
@@ -83,6 +84,19 @@ class _CurrentWeather extends State<CurrentWeather> {
 
             //call get weather (current)
           },
+          trailing: IconButton(
+            icon: (Geo.isFavoutire(geo)) ?
+              const Icon(Icons.star_rounded) :
+              const Icon(Icons.star_border_rounded),
+            onPressed: () {
+              Geo self = geo;
+              if(Geo.isFavoutire(self)) {
+                Geo.addFavourite(self);
+              } else {
+                Geo.removeFavourite(self);
+              }
+            },
+          ),
         ));
       });
 
@@ -97,7 +111,7 @@ class _CurrentWeather extends State<CurrentWeather> {
       _isGettingLocation = true;
     });
     try {
-      Geo.Geo current = await Geo.getLocation();
+      Geo current = await Geo.getLocation();
       current = await Geo.geocodeCurrentLocation(current);
 
       setState(() {

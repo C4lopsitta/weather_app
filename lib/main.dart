@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/pages/current_weather.dart';
 import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
+import 'package:weather_app/preferences.dart';
 
 import 'apis/geo.dart';
 
@@ -34,6 +35,13 @@ class ApplicationRoot extends StatefulWidget {
 class _ApplicationRoot extends State<ApplicationRoot> {
   int currentPageIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    Preferences.getInstance().then((_) {
+        Preferences.getPreferredLocaitions();
+    });
+  }
 
 
   @override
