@@ -57,7 +57,7 @@ class Weather_api{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "hourly":"temperature_2m,relative_humidity_2m,weather_code",
+      "hourly":"temperature_2m,relative_humidity_2m,weather_code,precipitation_probability",
     };
     Uri uri = Uri.https(api_url,path, params);
     print(uri.query);

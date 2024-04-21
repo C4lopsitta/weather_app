@@ -2,10 +2,9 @@ class Hourly{
   final List<dynamic> times;
   final List<dynamic> temperatures;
   final List<dynamic> humidities;
+  final List<dynamic> precipitationProbabilities;
   final List<dynamic> weatherCodes;
-  final List<dynamic> precipitationProbability;
-
-  Hourly(this.times, this.temperatures, this.humidities, this.weatherCodes, this.precipitationProbability);
+  Hourly(this.times, this.temperatures, this.humidities, this.weatherCodes, this.precipitationProbabilities);
 
   factory Hourly.fromJson(Map<String, dynamic> json){
     Hourly h = Hourly(
