@@ -18,47 +18,24 @@ class Weather_api{
   bool? dailyUvIndex = false;
   bool? dailyPrecipitationProbability = false;
 
-  bool? currentApparentTemperature = false;
-  bool? currentPrecipitation = false;
-  bool? currentWindSpeed = false;
-  bool? currentWindDirection = false;
-
   Weather_api({
       this.geo,
       this.dailySunset,
       this.dailySunrise,
       this.dailyUvIndex,
-      this.dailyPrecipitationProbability,
-      this.currentApparentTemperature,
-      this.currentPrecipitation,
-      this.currentWindSpeed,
-      this.currentWindDirection});
+      this.dailyPrecipitationProbability});
 
   String get api_url => _api_url;
 
   Future<Current?> call_api_current() async {
     const path = "/v1/forecast";
-    String api_apparent_temperature = ",";
-    String api_precipitation = ",";
-    String api_windSpeed = ",";
-    String api_windDirection = ",";
-
-    if(currentApparentTemperature == true)
-      api_apparent_temperature = ",apparent_temperature";
-    if(currentPrecipitation == true)
-      api_precipitation = ",precipitation";
-    if(currentWindSpeed == true)
-      api_windSpeed = ",wind_speed_10m";
-    if(currentWindDirection == true)
-      api_windDirection = ",wind_direction_10m";
-
 
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
 
-      "current": "temperature_2m,relative_humidity_2m,weather_code$api_apparent_temperature"
-        "$api_precipitation$api_windSpeed$api_windDirection",
+      "current": "temperature_2m,relative_humidity_2m,weather_code,apparent_temperature"
+        ",precipitation,wind_speed_10m,wind_direction_10m"
     };
     Uri uri = Uri.https(api_url,path, params);
     print(uri.query);
