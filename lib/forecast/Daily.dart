@@ -1,10 +1,10 @@
 class Daily{
   final List<dynamic> minTemperature;
   final List<dynamic> maxTemperature;
-  final List<dynamic>? sunrise;
-  final List<dynamic>? sunset;
-  final List<dynamic>? uvMaxIndex;
-  final List<dynamic>? precipitationProbability;
+  final List<dynamic> sunrise;
+  final List<dynamic> sunset;
+  final List<dynamic> uvMaxIndex;
+  final List<dynamic> precipitationProbability;
   final List<dynamic> weatherCode;
   final List<dynamic> dates;
   Daily(this.minTemperature, this.maxTemperature, this.sunrise, this.sunset,
