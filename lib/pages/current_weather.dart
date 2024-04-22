@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:weather_app/apis/geo.dart' as Geo;
+import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/Weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/weather_header.dart';
@@ -20,7 +20,7 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
-  Geo.Geo? _selectedGeo;
+  Geo? _selectedGeo;
   BuildContext? sheetContext;
   bool _isGettingLocation = false;
 
@@ -87,7 +87,7 @@ class _CurrentWeather extends State<CurrentWeather> {
           title: Text(geo.city ?? "UNDEFINED"),
           subtitle: Text(geo.fullName ?? ""),
           onTap: () {
-            Geo.Geo self = geo;
+            Geo self = geo;
             setState(() {
               _selectedGeo = self;
               if(geo.city != null) _searchTextController.text = geo.city!;
@@ -111,7 +111,7 @@ class _CurrentWeather extends State<CurrentWeather> {
       isWeatherReady = false;
     });
     try {
-      Geo.Geo current = await Geo.getLocation();
+      Geo current = await Geo.getLocation();
       current = await Geo.geocodeCurrentLocation(current);
 
       setState(() {
