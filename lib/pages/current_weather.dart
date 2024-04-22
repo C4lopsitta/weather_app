@@ -5,6 +5,7 @@ import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/sunset_sunrise_card.dart';
+import 'package:weather_app/components/uv_index_card.dart';
 import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
@@ -211,6 +212,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                             child: GridView.count(
                               primary: false,
                               crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
                               crossAxisCount: 2,
                               children: [
                                 WindCard(
@@ -223,7 +225,9 @@ class _CurrentWeather extends State<CurrentWeather> {
                                 )
                               ],
                             )
-                          )
+                          ),
+                          const SizedBox(height: 10),
+                          UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255)
                         ]
                       )
                     )
