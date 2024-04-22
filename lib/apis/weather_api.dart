@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/forecast/current.dart';
 import 'package:weather_app/forecast/daily.dart';
-import 'package:weather_app/preferences_storage.dart';
 import '../forecast/hourly.dart';
 import 'geo.dart';
 
