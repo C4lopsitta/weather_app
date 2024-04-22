@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/forecast/HistoricalWind.dart';
+import 'package:weather_app/forecast/historical/HistoricalWind.dart';
 
 import 'geo.dart';
 
