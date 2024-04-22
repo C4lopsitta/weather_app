@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:weather_app/apis/geo.dart' as Geo;
 import 'package:weather_app/apis/Weather_api.dart';
+import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
 
+import '../forecast/Current.dart';
+import '../forecast/Daily.dart';
 import '../forecast/Hourly.dart';
 
 class CurrentWeather extends StatefulWidget {
@@ -17,9 +20,15 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
-  Geo.Geo? _selectedGeo = null;
-  BuildContext? sheetContext = null;
+  Geo.Geo? _selectedGeo;
+  BuildContext? sheetContext;
   bool _isGettingLocation = false;
+
+  bool isWeatherReady = false;
+
+  Current? currentWeather;
+  Daily? dailyWeather;
+  Hourly? hourlyWeather;
   
   void _openSheet() {
     if(_searchTextController.text.isNotEmpty) {
@@ -99,6 +108,7 @@ class _CurrentWeather extends State<CurrentWeather> {
   Future _geocodeCurrentLocation() async {
     setState(() {
       _isGettingLocation = true;
+      isWeatherReady = false;
     });
     try {
       Geo.Geo current = await Geo.getLocation();
@@ -114,13 +124,20 @@ class _CurrentWeather extends State<CurrentWeather> {
       print(exception.toString());
     }
 
-
+    _getWeatherForSelectedGeo();
   }
 
   Future _getWeatherForSelectedGeo() async {
     if(_selectedGeo == null) return;
-    Weather_api current = Weather_api(geo: _selectedGeo!);
-    current.call_api_current();
+
+    WeatherApi current = WeatherApi(geo: _selectedGeo!);
+    currentWeather = await current.call_api_current();
+    dailyWeather = await current.call_api_daily();
+    hourlyWeather = await current.call_api_hourly();
+
+    setState(() {
+      isWeatherReady = true;
+    });
   }
 
   final TextEditingController _searchTextController = TextEditingController();
@@ -130,6 +147,7 @@ class _CurrentWeather extends State<CurrentWeather> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Padding(
@@ -137,6 +155,7 @@ class _CurrentWeather extends State<CurrentWeather> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               SearchBar(
                 controller: _searchTextController,
@@ -144,7 +163,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                   _getSuggestions(text).then((value) => _openSheet());
                 },
                 trailing: [ IconButton(
-                  icon: Icon(Icons.search_rounded),
+                  icon: const Icon(Icons.search_rounded),
                   onPressed: () {
                     String text = _searchTextController.text;
                     _getSuggestions(text).then((value) => _openSheet());
@@ -163,28 +182,36 @@ class _CurrentWeather extends State<CurrentWeather> {
                     onPressed: () => _geocodeCurrentLocation(),
                   ),
               ),
-              if(_selectedGeo != null)
-                SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      WeatherHeader(
-                        city: _selectedGeo!.city,
-                        weatherDescription: null,
-                        temperature: 21.2,
-                        minTemp: 14,
-                        maxTemp: 23,
-                        perceivedTemp: 20
-                      ),
-                      HourlyWeatherCard(hourly: Hourly(
-                        ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"],
-                        [20.0, 19.0, 15.0, 14.0, 14.0, 13.0, 12.0],
-                        [66.0, 50.0, 44.0, 30.0, 33.0, 37.0, 29.0],
-                        [1.0, 2.0, 3.0, 2.0, 2.0, 2.0, 2.0],
-                        [43.0, 12.0, 1.0, 2.0, 1.0, 1.0, 1.0]
-                      ))
-                    ]
+              if(_selectedGeo != null )
+                if(isWeatherReady)
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height - 184,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          WeatherHeader(
+                            city: _selectedGeo!.city,
+                            temperature: currentWeather!.temperature,
+                            status: currentWeather!.weatherCode,
+                            minTemp: dailyWeather!.minTemperature[0],
+                            maxTemp: dailyWeather!.maxTemperature[0],
+                            perceivedTemp: currentWeather!.apparentTemperature
+                          ),
+                          HourlyWeatherCard(hourly: hourlyWeather!),
+                          DailyWeatherCard(daily: dailyWeather!)
+                        ]
+                      )
+                    )
                   )
-                ),
+                else
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.75,
+                    child: const Center(
+                      child: CircularProgressIndicator()
+                    )
+                  )
               ],
           ),
         ),
