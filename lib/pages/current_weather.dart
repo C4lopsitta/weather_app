@@ -9,6 +9,7 @@ import 'package:weather_app/components/uv_index_card.dart';
 import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
+import 'package:weather_app/preferences_storage.dart';
 
 import '../forecast/current.dart';
 import '../forecast/daily.dart';
@@ -34,7 +35,13 @@ class _CurrentWeather extends State<CurrentWeather> {
   Current? currentWeather;
   Daily? dailyWeather;
   Hourly? hourlyWeather;
-  
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
   void _openSheet() {
     if(_searchTextController.text.isNotEmpty) {
       showModalBottomSheet(
@@ -141,6 +148,13 @@ class _CurrentWeather extends State<CurrentWeather> {
     currentWeather = await current.call_api_current();
     dailyWeather = await current.call_api_daily();
     hourlyWeather = await current.call_api_hourly();
+
+    PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, _selectedGeo!.city ?? "");
+    PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, _selectedGeo!.fullName ?? "");
+    PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, _selectedGeo!.lat);
+    PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, _selectedGeo!.lon);
+    PreferencesStorage.writeInteger(PreferencesStorage.GEO_LAST_LOAD, lastWeatherUpdate.millisecondsSinceEpoch);
+
     lastWeatherUpdate = DateTime.now();
 
     setState(() {
