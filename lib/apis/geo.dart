@@ -66,7 +66,7 @@ Future<List<Geo>?> geocodeLocation(String location) async {
       String fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
 
       geocodes.add(
-          Geo(coords[0], coords[1], city: placeName, fullName: fullName));
+          Geo(coords[1], coords[0], city: placeName, fullName: fullName));
     });
   });
 
@@ -87,8 +87,7 @@ Future<Geo> geocodeCurrentLocation(Geo current) async {
 
     List<dynamic> coords = feature["geometry"]["coordinates"];
 
-    current.lat = coords[0];
-    current.lon = coords[1];
+    current.lat = coords[1];
     current.city = feature["properties"]["name"] ?? "UNDEFINED";
     current.fullName = feature["properties"]["display_name"] ?? "UNDEFINED";
   });

@@ -201,6 +201,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                           ),
                           HourlyWeatherCard(hourly: hourlyWeather!),
                           DailyWeatherCard(daily: dailyWeather!)
+
                         ]
                       )
                     )
