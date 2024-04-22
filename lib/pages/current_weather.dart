@@ -200,111 +200,119 @@ class _CurrentWeather extends State<CurrentWeather> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(height: MediaQuery.of(context).viewPadding.top),
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SearchBar(
-                controller: _searchTextController,
-                onSubmitted: (text) {
-                  _getSuggestions(text).then((value) => _openSheet());
-                },
-                trailing: [ IconButton(
-                  icon: (!_isGettingSuggestions) ?
-                    const Icon(Icons.search_rounded) :
-                    const SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator()
-                    ),
-                  onPressed: () {
-                    String text = _searchTextController.text;
+    return RefreshIndicator(
+      onRefresh: () async {
+        if(_selectedGeo != null && isWeatherReady == true) {
+          setState(() { isWeatherReady = false; });
+          _getWeatherForSelectedGeo();
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: MediaQuery.of(context).viewPadding.top),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SearchBar(
+                  controller: _searchTextController,
+                  onSubmitted: (text) {
                     _getSuggestions(text).then((value) => _openSheet());
                   },
-                ) ],
-                leading: (_isGettingLocation) ?
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator()
-                    )
-                  ) : IconButton(
-                    icon: const Icon(Icons.location_on_rounded),
-                    onPressed: () => _geocodeCurrentLocation(),
-                  ),
-              ),
-              if(_selectedGeo != null )
-                if(isWeatherReady)
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height - 160
-                        - MediaQuery.of(context).viewPadding.top,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          WeatherHeader(
-                            city: _selectedGeo!.city,
-                            temperature: currentWeather!.temperature,
-                            status: currentWeather!.weatherCode,
-                            minTemp: dailyWeather!.minTemperature[0],
-                            maxTemp: dailyWeather!.maxTemperature[0],
-                            perceivedTemp: currentWeather!.apparentTemperature,
-                            lastUpdate: lastWeatherUpdate
-                          ),
-                          HourlyWeatherCard(hourly: hourlyWeather!),
-                          const SizedBox(height: 12),
-                          DailyWeatherCard(daily: dailyWeather!),
-                          SizedBox(
-                            height: MediaQuery.sizeOf(context).height * 0.26,
-                            child: GridView.count(
-                              primary: false,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              crossAxisCount: 2,
-                              children: [
-                                WindCard(
-                                  windDirection: currentWeather!.windDirection,
-                                  windSpeed: currentWeather!.windSpeed
-                                ),
-                                SunsetSunriseCard(
-                                    sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
-                                    sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
-                                ),
-                              ],
-                            )
-                          ),
-                          const SizedBox(height: 12),
-                          UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
-                          const SizedBox(height: 12),
-                          FullAddressCard(address: _selectedGeo?.fullName ?? ""),
-                          const SizedBox(height: 24)
-                        ]
+                  trailing: [ IconButton(
+                    icon: (!_isGettingSuggestions) ?
+                      const Icon(Icons.search_rounded) :
+                      const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator()
+                      ),
+                    onPressed: () {
+                      String text = _searchTextController.text;
+                      _getSuggestions(text).then((value) => _openSheet());
+                    },
+                  ) ],
+                  leading: (_isGettingLocation) ?
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator()
+                      )
+                    ) : IconButton(
+                      icon: const Icon(Icons.location_on_rounded),
+                      onPressed: () => _geocodeCurrentLocation(),
+                    ),
+                ),
+                if(_selectedGeo != null )
+                  if(isWeatherReady)
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height - 160
+                          - MediaQuery.of(context).viewPadding.top,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            WeatherHeader(
+                              city: _selectedGeo!.city,
+                              temperature: currentWeather!.temperature,
+                              status: currentWeather!.weatherCode,
+                              minTemp: dailyWeather!.minTemperature[0],
+                              maxTemp: dailyWeather!.maxTemperature[0],
+                              perceivedTemp: currentWeather!.apparentTemperature,
+                              lastUpdate: lastWeatherUpdate
+                            ),
+                            HourlyWeatherCard(hourly: hourlyWeather!),
+                            const SizedBox(height: 12),
+                            DailyWeatherCard(daily: dailyWeather!),
+                            SizedBox(
+                              height: MediaQuery.sizeOf(context).height * 0.26,
+                              child: GridView.count(
+                                primary: false,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                crossAxisCount: 2,
+                                children: [
+                                  WindCard(
+                                    windDirection: currentWeather!.windDirection,
+                                    windSpeed: currentWeather!.windSpeed
+                                  ),
+                                  SunsetSunriseCard(
+                                      sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
+                                      sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
+                                  ),
+                                ],
+                              )
+                            ),
+                            const SizedBox(height: 12),
+                            UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
+                            const SizedBox(height: 12),
+                            FullAddressCard(address: _selectedGeo?.fullName ?? ""),
+                            const SizedBox(height: 24)
+                          ]
+                        )
                       )
                     )
-                  )
-                else
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.75,
-                    child: const Center(
-                      child: CircularProgressIndicator()
+                  else
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      child: const Center(
+                        child: CircularProgressIndicator()
+                      )
                     )
-                  )
-              ],
+                ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -32,16 +32,17 @@ class _SunsetSunriseCard extends State<SunsetSunriseCard> {
             children: [
               const Text("Sunrise and Sunset", style: TextStyle(fontSize: 16, height: 1.75)),
               const Divider(),
-              Center(
-                child: Column(
-                  children: [
-                    const Icon(Icons.wb_twilight_rounded),
-                    Text(formatter.format(DateTime.parse(widget.sunrise))),
-                    const Icon(Icons.nights_stay_rounded),
-                    Text(formatter.format(DateTime.parse(widget.sunset)))
-                  ],
-                )
-              ),
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.wb_twilight_rounded),
+                  Text(formatter.format(DateTime.parse(widget.sunrise))),
+                  const Icon(Icons.nights_stay_rounded),
+                  Text(formatter.format(DateTime.parse(widget.sunset)))
+                ],
+              )
             ],
           ),
         )
