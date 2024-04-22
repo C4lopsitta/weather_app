@@ -26,6 +26,7 @@ class _CurrentWeather extends State<CurrentWeather> {
   Geo? _selectedGeo;
   BuildContext? sheetContext;
   bool _isGettingLocation = false;
+  bool _isGettingSuggestions = false;
   DateTime lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(0);
 
   bool isWeatherReady = false;
@@ -82,6 +83,7 @@ class _CurrentWeather extends State<CurrentWeather> {
   }
 
   Future _getSuggestions(String searchKey) async {
+    setState(() { _isGettingSuggestions = true; });
     List<ListTile> liveSuggestions = [];
 
     await Geo.geocodeLocation(searchKey).then((geos) {
@@ -95,15 +97,16 @@ class _CurrentWeather extends State<CurrentWeather> {
             setState(() {
               _selectedGeo = self;
               if(geo.city != null) _searchTextController.text = geo.city!;
+              isWeatherReady = false;
             });
             if(sheetContext != null) Navigator.pop(sheetContext!);
-
-            //call get weather (current)
+            _getWeatherForSelectedGeo();
           },
         ));
       });
 
       setState(() {
+        _isGettingSuggestions = false;
         suggestions = liveSuggestions;
       });
     });
@@ -168,7 +171,13 @@ class _CurrentWeather extends State<CurrentWeather> {
                   _getSuggestions(text).then((value) => _openSheet());
                 },
                 trailing: [ IconButton(
-                  icon: const Icon(Icons.search_rounded),
+                  icon: (!_isGettingSuggestions) ?
+                    const Icon(Icons.search_rounded) :
+                    const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator()
+                    ),
                   onPressed: () {
                     String text = _searchTextController.text;
                     _getSuggestions(text).then((value) => _openSheet());
@@ -190,7 +199,8 @@ class _CurrentWeather extends State<CurrentWeather> {
               if(_selectedGeo != null )
                 if(isWeatherReady)
                   SizedBox(
-                    height: MediaQuery.of(context).size.height - 184,
+                    height: MediaQuery.of(context).size.height - 160
+                        - MediaQuery.of(context).viewPadding.top,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: Column(
@@ -226,7 +236,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                               ],
                             )
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 12),
                           UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255)
                         ]
                       )

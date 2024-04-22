@@ -47,6 +47,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
         selectedIndex: currentPageIndex,
+        height: 80,
         destinations: const [
           NavigationDestination(
               icon: Icon(Icons.wb_cloudy_outlined),

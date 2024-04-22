@@ -38,7 +38,7 @@ class _WeatherHeader extends State<WeatherHeader> {
   }
 
   TextStyle city = const TextStyle(fontSize: 18);
-  TextStyle description = const TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
+  TextStyle description = const TextStyle(fontSize: 20, fontWeight: FontWeight.w500);
   TextStyle temperature = const TextStyle(fontSize: 52, fontWeight: FontWeight.w600);
   TextStyle updatedStyle = const TextStyle(fontSize: 11, fontWeight: FontWeight.w300, height: 0.2);
 
@@ -73,7 +73,7 @@ class _WeatherHeader extends State<WeatherHeader> {
             ],
           ),
           Container(
-            width: MediaQuery.of(context).size.width * 0.26,
+            width: MediaQuery.of(context).size.width * 0.25,
             alignment: AlignmentDirectional.bottomEnd,
             child: Icon(
                 WeatherTranslator.getWeatherIcon(widget.status),
