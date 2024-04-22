@@ -47,7 +47,7 @@ class WeatherApi{
               print("api call: " + result.body);
               this._responseJson = json.decode(result.body);
               //print(this._responseJson);
-            FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
+            // FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
         }
     );
     print(Current.fromJson(this._responseJson).temperature);
@@ -71,7 +71,7 @@ class WeatherApi{
           this._responseJson = json.decode(result.body);
           //print(this._responseJson);
 
-          FileStorage.writeFile(FileStorage.HOURLY_FILE, result.body);
+          // FileStorage.writeFile(FileStorage.HOURLY_FILE, result.body);
         }
     );
     return Hourly.fromJson(this._responseJson);
@@ -109,7 +109,7 @@ class WeatherApi{
           this._responseJson = json.decode(result.body);
           //print(this._responseJson);
 
-          FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
+          // FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
           }
     );
     return Daily.fromJson(this._responseJson);

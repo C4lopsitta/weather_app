@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
@@ -39,7 +40,31 @@ class _CurrentWeather extends State<CurrentWeather> {
   @override
   void initState() {
     super.initState();
+    loadFromStorage();
+  }
 
+  Future loadFromStorage() async {
+    print("Loading!");
+
+    await PreferencesStorage.initialize();
+
+    //load last geo (if exists)
+    int? lastLoadTimeFromStorage = await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD);
+    if(lastLoadTimeFromStorage == null) return;
+    String? city = await PreferencesStorage.readString(PreferencesStorage.GEO_CITY);
+    String? fullName = await PreferencesStorage.readString(PreferencesStorage.GEO_FULLNAME);
+    double? lat = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LAT);
+    double? lon = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LON);
+
+    setState(() {
+      _selectedGeo = Geo(lat ?? 0.0, lon ?? 0.0, city: city, fullName: fullName);
+      lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(lastLoadTimeFromStorage);
+    });
+
+    print("Loaded!");
+
+    _searchTextController.text = city ?? "";
+    _getWeatherForSelectedGeo();
   }
 
   void _openSheet() {
@@ -149,17 +174,25 @@ class _CurrentWeather extends State<CurrentWeather> {
     dailyWeather = await current.call_api_daily();
     hourlyWeather = await current.call_api_hourly();
 
-    PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, _selectedGeo!.city ?? "");
-    PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, _selectedGeo!.fullName ?? "");
-    PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, _selectedGeo!.lat);
-    PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, _selectedGeo!.lon);
-    PreferencesStorage.writeInteger(PreferencesStorage.GEO_LAST_LOAD, lastWeatherUpdate.millisecondsSinceEpoch);
-
     lastWeatherUpdate = DateTime.now();
+
+    storeGeo();
 
     setState(() {
       isWeatherReady = true;
     });
+  }
+
+  void storeGeo() async {
+    await PreferencesStorage.initialize();
+
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, _selectedGeo!.city ?? "");
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, _selectedGeo!.fullName ?? "");
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, _selectedGeo!.lat);
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, _selectedGeo!.lon);
+    await PreferencesStorage.writeInteger(PreferencesStorage.GEO_LAST_LOAD, lastWeatherUpdate.millisecondsSinceEpoch);
+
+    print("Stored Geo");
   }
 
   final TextEditingController _searchTextController = TextEditingController();

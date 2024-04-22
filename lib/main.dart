@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/pages/current_weather.dart';
 import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
@@ -42,7 +41,7 @@ class _ApplicationRoot extends State<ApplicationRoot> {
     super.initState();
 
     FileStorage.initialize();
-
+    PreferencesStorage.initialize();
   }
 
   @override

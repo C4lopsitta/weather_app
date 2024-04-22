@@ -40,22 +40,22 @@ class FileStorage {
 class PreferencesStorage {
   static SharedPreferences? preferences;
 
-  static void initialize() async {
+  static Future initialize() async {
     if(preferences != null) return;
     preferences = await SharedPreferences.getInstance();
   }
 
-  static void writeString(String preference, String data) async {
+  static Future writeString(String preference, String data) async {
     if(preferences == null) return;
     preferences!.setString(preference, data);
   }
 
-  static void writeDouble(String preference, double data) async {
+  static Future writeDouble(String preference, double data) async {
     if(preferences == null) return;
     preferences!.setDouble(preference, data);
   }
 
-  static void writeInteger(String preference, int data) async {
+  static Future writeInteger(String preference, int data) async {
     if(preferences == null) return;
     preferences!.setInt(preference, data);
   }
@@ -71,7 +71,7 @@ class PreferencesStorage {
   }
 
   static Future<int?> readInteger(String preference) async {
-    if(preferences == null) return -1234567890;
+    if(preferences == null) return null;
     return preferences!.getInt(preference);
   }
 
