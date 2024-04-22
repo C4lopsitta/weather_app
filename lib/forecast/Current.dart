@@ -5,7 +5,7 @@ class Current {
   final double windSpeed;
   final String windDirection;
   final int weatherCode;
-  final int precipitation;
+  final double precipitation;
   final int humidity;
   Current(this.temperature, this.apparentTemperature, this.windSpeed,
       this.windDirection, this.weatherCode, this.precipitation, this.humidity);

@@ -1,22 +1,23 @@
 import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:weather_app/forecast/WeatherTranslator.dart';
 
 class WeatherHeader extends StatefulWidget {
   WeatherHeader({
     super.key,
     required this.city,
-    required this.weatherDescription,
     required this.temperature,
     required this.minTemp,
     required this.maxTemp,
     required this.perceivedTemp,
+    required this.status,
     this.cityFromGPS = false
   });
 
   bool cityFromGPS = false;
   String? city;
-  String? weatherDescription;
-  IconData icon = Icons.not_accessible_rounded;
+  int status;
   double temperature;
   double maxTemp;
   double minTemp;
@@ -32,6 +33,7 @@ class _WeatherHeader extends State<WeatherHeader> {
     super.initState();
   }
 
+  TextStyle city = const TextStyle(fontSize: 18);
   TextStyle description = const TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
   TextStyle temperature = const TextStyle(fontSize: 52, fontWeight: FontWeight.w600);
 
@@ -52,12 +54,12 @@ class _WeatherHeader extends State<WeatherHeader> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.city ?? "Wadafak", ),
-              Text("${widget.temperature.round()}°C", style: temperature, ),
+              Text(widget.city ?? "Wadafak", style: city),
+              Text("${widget.temperature.round()}°C", style: temperature),
               Baseline(
                 baseline: 10,
                 baselineType: TextBaseline.alphabetic,
-                child: Text(widget.weatherDescription ?? "API Failed", style: description)
+                child: Text(WeatherTranslator.getWeatherDescription(widget.status) ?? "API Failed", style: description)
               ),
               Text("${widget.maxTemp.round()}° / ${widget.minTemp.round()}° Feels like ${widget.perceivedTemp.round()}°")
             ],
@@ -66,7 +68,7 @@ class _WeatherHeader extends State<WeatherHeader> {
             width: MediaQuery.of(context).size.width * 0.26,
             alignment: AlignmentDirectional.bottomEnd,
             child: Icon(
-                widget.icon,
+                WeatherTranslator.getWeatherIcon(widget.status),
               size: MediaQuery.of(context).size.width * 0.25,
             )
           )

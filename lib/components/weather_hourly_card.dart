@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/components/icon_text.dart';
+import 'package:weather_app/forecast/WeatherTranslator.dart';
 import '../forecast/Hourly.dart';
 
 class HourlyWeatherCard extends StatefulWidget {
@@ -96,14 +98,23 @@ class _HourlyTile {
   static List<_HourlyTile> tilesFromAPI(Hourly hourly) {
     List<_HourlyTile> tiles = [];
 
+    DateTime now = DateTime.now();
+    DateTime limit = DateTime.fromMillisecondsSinceEpoch(now.millisecondsSinceEpoch + (24 * 60 * 60 * 1000));
+    DateFormat format = DateFormat.Hm();
+
     for(int i = 0; i < hourly.times.length; i++) {
-      tiles.add(_HourlyTile(
-          icon: Icons.local_drink_rounded,
-          date: hourly.times[i],
-          temp: hourly.temperatures[i],
-          precipitationProbability: hourly.precipitationProbability[i],
-          humidity: hourly.humidities[i]
-      ));
+      DateTime time = DateTime.parse(hourly.times[i]);
+
+      if((time.isAfter(now) && (time.isBefore(limit))) || (time.day == now.day && time.hour == now.hour)) {
+        tiles.add(_HourlyTile(
+            icon: WeatherTranslator.getWeatherIcon(hourly.weatherCodes[i]),
+            date: format.format(time),
+            temp: hourly.temperatures[i],
+            precipitationProbability: (hourly.precipitationProbabilities[i] *
+                1.0),
+            humidity: (hourly.humidities[i] * 1.0)
+        ));
+      }
     }
 
     return tiles;

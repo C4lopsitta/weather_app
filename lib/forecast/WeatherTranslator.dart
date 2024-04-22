@@ -9,18 +9,18 @@ import 'package:flutter/material.dart';
 // 71,73, 75, 76, 77, 85,86, snowy
 // 95, 96, 99 thunderstorm
 class WeatherTranslator{
-  static Icon getWeatherIcon(int weatherStatus){  //weatherStatus is a standard WMO number
+  static IconData getWeatherIcon(int weatherStatus){  //weatherStatus is a standard WMO number
     if(weatherStatus == 0 || weatherStatus == 1)
-      return Icon(Icons.sunny);
+      return Icons.sunny;
     if(weatherStatus == 2 || weatherStatus == 3)
-      return Icon(Icons.cloud);
+      return Icons.cloud;
     if(weatherStatus == 45 || weatherStatus == 48)
-      return Icon(Icons.foggy);
+      return Icons.foggy;
     if(weatherStatus <= 51 || weatherStatus <= 86)
-      return Icon(Icons.cloudy_snowing);
+      return Icons.cloudy_snowing;
     if(weatherStatus == 95 || weatherStatus == 96 || weatherStatus == 99)
-      return Icon(Icons.thunderstorm);
-    return Icon(Icons.question_mark);
+      return Icons.thunderstorm;
+    return Icons.question_mark;
   }
   static String getWeatherDescription(int weatherStatus){  //weatherStatus is a standard WMO number
     if(weatherStatus == 0)

@@ -6,7 +6,7 @@ import 'package:weather_app/forecast/Daily.dart';
 import '../forecast/Hourly.dart';
 import 'geo.dart';
 
-class Weather_api{
+class WeatherApi{
 
   Map<String, dynamic> _responseJson = {};
 
@@ -18,7 +18,7 @@ class Weather_api{
   bool? dailyUvIndex = false;
   bool? dailyPrecipitationProbability = false;
 
-  Weather_api({
+  WeatherApi({
       this.geo,
       this.dailySunset,
       this.dailySunrise,
