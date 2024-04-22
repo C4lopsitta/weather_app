@@ -33,7 +33,7 @@ class _UvIndexCard extends State<UvIndexCard> {
               const SizedBox( width: 12 ),
               const Text("UV Index"),
               const Spacer(),
-              Text("${widget.uvIndex.round()}", style: style)
+              Text(widget.uvIndex.toStringAsFixed(2), style: style)
             ],
           ),
         ),
