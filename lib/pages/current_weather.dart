@@ -6,6 +6,7 @@ import 'package:weather_app/apis/Weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
+import 'package:weather_app/components/wind_card.dart';
 
 import '../forecast/Current.dart';
 import '../forecast/Daily.dart';
@@ -200,8 +201,15 @@ class _CurrentWeather extends State<CurrentWeather> {
                             perceivedTemp: currentWeather!.apparentTemperature
                           ),
                           HourlyWeatherCard(hourly: hourlyWeather!),
-                          DailyWeatherCard(daily: dailyWeather!)
-
+                          DailyWeatherCard(daily: dailyWeather!),
+                          Row(
+                            children: [
+                              WindCard(
+                                windDirection: currentWeather!.windDirection,
+                                windSpeed: currentWeather!.windSpeed
+                              )
+                            ],
+                          )
                         ]
                       )
                     )
