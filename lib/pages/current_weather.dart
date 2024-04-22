@@ -264,6 +264,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                             lastUpdate: lastWeatherUpdate
                           ),
                           HourlyWeatherCard(hourly: hourlyWeather!),
+                          const SizedBox(height: 12),
                           DailyWeatherCard(daily: dailyWeather!),
                           SizedBox(
                             height: MediaQuery.sizeOf(context).height * 0.26,
@@ -286,7 +287,9 @@ class _CurrentWeather extends State<CurrentWeather> {
                           ),
                           const SizedBox(height: 12),
                           UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
-                          FullAddressCard(address: _selectedGeo?.fullName ?? "")
+                          const SizedBox(height: 12),
+                          FullAddressCard(address: _selectedGeo?.fullName ?? ""),
+                          const SizedBox(height: 24)
                         ]
                       )
                     )
