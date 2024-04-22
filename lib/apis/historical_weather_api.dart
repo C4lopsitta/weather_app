@@ -12,7 +12,7 @@ import 'geo.dart';
 class HistoricalWeatherApi{
   Map<String, dynamic> _responseJson = {};
   Geo? geo = Geo(44.59703140, 7.61142170);
-  DateFormat dateFormatter = DateFormat.yMd();
+  DateFormat _dateFormatter = DateFormat.yMd();
   DateTime startDate = DateTime(2024);
   DateTime endDate = DateTime(2024);
   final _api_url = "https://archive-api.open-meteo.com";
@@ -29,8 +29,8 @@ class HistoricalWeatherApi{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "start_date": dateFormatter.format(startDate),
-      "end_date": dateFormatter.format(endDate),
+      "start_date": _dateFormatter.format(startDate),
+      "end_date": _dateFormatter.format(endDate),
 
       "daily": "wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant"
     };
@@ -53,8 +53,8 @@ class HistoricalWeatherApi{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "start_date": dateFormatter.format(startDate),
-      "end_date": dateFormatter.format(endDate),
+      "start_date": _dateFormatter.format(startDate),
+      "end_date": _dateFormatter.format(endDate),
 
       "daily": "temperature_2m_max,temperature_2m_min,temperature_2m_mean,apparent_temperature_max,"
           "apparent_temperature_min,apparent_temperature_mean"
@@ -77,8 +77,8 @@ class HistoricalWeatherApi{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "start_date": dateFormatter.format(startDate),
-      "end_date": dateFormatter.format(endDate),
+      "start_date": _dateFormatter.format(startDate),
+      "end_date": _dateFormatter.format(endDate),
 
       "daily": "sunrise,sunset,daylight_duration,sunshine_duration"
     };
@@ -101,8 +101,8 @@ class HistoricalWeatherApi{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "start_date": dateFormatter.format(startDate),
-      "end_date": dateFormatter.format(endDate),
+      "start_date": _dateFormatter.format(startDate),
+      "end_date": _dateFormatter.format(endDate),
 
       "daily": "precipitation_sum,rain_sum,snowfall_sum,precipitation_hours"
     };
@@ -125,8 +125,8 @@ class HistoricalWeatherApi{
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
-      "start_date": dateFormatter.format(startDate),
-      "end_date": dateFormatter.format(endDate),
+      "start_date": _dateFormatter.format(startDate),
+      "end_date": _dateFormatter.format(endDate),
 
       "daily": "precipitation_sum,rain_sum,snowfall_sum,precipitation_hours"
     };

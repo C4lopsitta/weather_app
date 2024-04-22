@@ -1,4 +1,5 @@
 class HistoricalTemperature{
+  List<dynamic> times;
   List<dynamic> temperatureMax;
   List<dynamic> temperatureMin;
   List<dynamic> temperatureMean;
@@ -6,11 +7,19 @@ class HistoricalTemperature{
   List<dynamic> apparentTemperatureMin;
   List<dynamic> apparentTemperatureMean;
 
-  HistoricalTemperature(this.temperatureMax, this.temperatureMin,
-      this.temperatureMean, this.apparentTemperatureMax,
-      this.apparentTemperatureMin, this.apparentTemperatureMean);
+
+  HistoricalTemperature(
+      this.times,
+      this.temperatureMax,
+      this.temperatureMin,
+      this.temperatureMean,
+      this.apparentTemperatureMax,
+      this.apparentTemperatureMin,
+      this.apparentTemperatureMean);
+
   factory HistoricalTemperature.fromJson(Map<String,dynamic> json){
     HistoricalTemperature t = HistoricalTemperature(
+      json["daily"]["time"],
       json["daily"]["temperature_2m_max"],
       json["daily"]["temperature_2m_min"],
       json["daily"]["temperature_2m_mean"],
