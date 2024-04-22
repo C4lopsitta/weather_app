@@ -7,7 +7,7 @@ import 'package:weather_app/forecast/historical/HistoricalWind.dart';
 import '../forecast/historical/HistoricalTempetature.dart';
 import 'geo.dart';
 
-class HistoricalWeather{
+class HistoricalWeatherApi{
   Map<String, dynamic> _responseJson = {};
   Geo? geo = Geo(44.59703140, 7.61142170);
   DateFormat dateFormatter = DateFormat.yMd();
@@ -15,7 +15,7 @@ class HistoricalWeather{
   DateTime endDate = DateTime(2024);
   final _api_url = "https://archive-api.open-meteo.com";
 
-  HistoricalWeather({
+  HistoricalWeatherApi({
     this.geo,
     required this.startDate,
     required this.endDate
