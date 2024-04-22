@@ -49,6 +49,10 @@ class _CurrentWeather extends State<CurrentWeather> {
 
     await PreferencesStorage.initialize();
 
+    if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
+      return _geocodeCurrentLocation();
+    }
+
     //load last geo (if exists)
     int? lastLoadTimeFromStorage = await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD);
     if(lastLoadTimeFromStorage == null) return;
@@ -186,6 +190,9 @@ class _CurrentWeather extends State<CurrentWeather> {
 
   void storeGeo() async {
     await PreferencesStorage.initialize();
+
+    if(await PreferencesStorage.readBoolean(SettingPreferences.DONT_OVERWRITE_LOCATION) == true &&
+       await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD) != null) return;
 
     await PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, _selectedGeo!.city ?? "");
     await PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, _selectedGeo!.fullName ?? "");
