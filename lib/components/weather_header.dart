@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/forecast/weather_translator.dart';
 
 class WeatherHeader extends StatefulWidget {
@@ -12,7 +14,8 @@ class WeatherHeader extends StatefulWidget {
     required this.maxTemp,
     required this.perceivedTemp,
     required this.status,
-    this.cityFromGPS = false
+    this.cityFromGPS = false,
+    this.lastUpdate
   });
 
   bool cityFromGPS = false;
@@ -22,6 +25,7 @@ class WeatherHeader extends StatefulWidget {
   double maxTemp;
   double minTemp;
   double perceivedTemp;
+  DateTime? lastUpdate;
 
   @override
   State<StatefulWidget> createState() => _WeatherHeader();
@@ -36,6 +40,9 @@ class _WeatherHeader extends State<WeatherHeader> {
   TextStyle city = const TextStyle(fontSize: 18);
   TextStyle description = const TextStyle(fontSize: 24, fontWeight: FontWeight.w500);
   TextStyle temperature = const TextStyle(fontSize: 52, fontWeight: FontWeight.w600);
+  TextStyle updatedStyle = const TextStyle(fontSize: 11, fontWeight: FontWeight.w300, height: 0.2);
+
+  DateFormat formatter = DateFormat.Hm();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +62,7 @@ class _WeatherHeader extends State<WeatherHeader> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(widget.city ?? "Wadafak", style: city),
+              Text("Last updated at ${formatter.format(widget.lastUpdate ?? DateTime.parse("1970-01-01"))}", style: updatedStyle),
               Text("${widget.temperature.round()}°C", style: temperature),
               Baseline(
                 baseline: 10,

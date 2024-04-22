@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:weather_app/apis/geo.dart';
-import 'package:weather_app/apis/Weather_api.dart';
+import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/sunset_sunrise_card.dart';
 import 'package:weather_app/components/weather_header.dart';
@@ -25,6 +25,7 @@ class _CurrentWeather extends State<CurrentWeather> {
   Geo? _selectedGeo;
   BuildContext? sheetContext;
   bool _isGettingLocation = false;
+  DateTime lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(0);
 
   bool isWeatherReady = false;
 
@@ -136,6 +137,7 @@ class _CurrentWeather extends State<CurrentWeather> {
     currentWeather = await current.call_api_current();
     dailyWeather = await current.call_api_daily();
     hourlyWeather = await current.call_api_hourly();
+    lastWeatherUpdate = DateTime.now();
 
     setState(() {
       isWeatherReady = true;
@@ -199,7 +201,8 @@ class _CurrentWeather extends State<CurrentWeather> {
                             status: currentWeather!.weatherCode,
                             minTemp: dailyWeather!.minTemperature[0],
                             maxTemp: dailyWeather!.maxTemperature[0],
-                            perceivedTemp: currentWeather!.apparentTemperature
+                            perceivedTemp: currentWeather!.apparentTemperature,
+                            lastUpdate: lastWeatherUpdate
                           ),
                           HourlyWeatherCard(hourly: hourlyWeather!),
                           DailyWeatherCard(daily: dailyWeather!),
