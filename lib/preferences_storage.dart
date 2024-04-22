@@ -3,6 +3,7 @@
 // call time will be added through the Local Preferences Storage API.
 
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,6 +61,13 @@ class PreferencesStorage {
     preferences!.setInt(preference, data);
   }
 
+  static Future writeBoolean(String preference, bool data) async {
+    if(preferences == null) return;
+    preferences!.setBool(preference, data);
+  }
+
+
+
   static Future<String?> readString(String preference) async {
     if(preferences == null) return "";
     return preferences!.getString(preference);
@@ -75,10 +83,24 @@ class PreferencesStorage {
     return preferences!.getInt(preference);
   }
 
+  static Future<bool?> readBoolean(String preference) async {
+    if(preferences == null) return null;
+    return preferences!.getBool(preference);
+  }
+
+  static Future drop(String preference) async {
+    if(preferences == null) return null;
+    await preferences!.remove(preference);
+  }
 
   static const String GEO_LAT = "geolat";
   static const String GEO_LON = "geolon";
   static const String GEO_CITY = "geocity";
   static const String GEO_FULLNAME = "geofullname";
   static const String GEO_LAST_LOAD = "geolastload";
+}
+
+class SettingPreferences {
+  static const String USE_GPS_DEFAULT = "gpsdefault";
+  static const String DONT_OVERWRITE_LOCATION = "keeplocation";
 }
