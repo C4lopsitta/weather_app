@@ -14,10 +14,10 @@ class WeatherApi{
   final String _api_url = "api.open-meteo.com";
   Geo? geo = Geo(44.59703140, 7.61142170);   //Cuneo coordinates
 
-  bool? dailySunset = false;
-  bool? dailySunrise = false;
-  bool? dailyUvIndex = false;
-  bool? dailyPrecipitationProbability = false;
+  bool? dailySunset = true;
+  bool? dailySunrise = true;
+  bool? dailyUvIndex = true;
+  bool? dailyPrecipitationProbability = true;
 
   WeatherApi({
       this.geo,
