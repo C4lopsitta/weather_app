@@ -20,28 +20,30 @@ class _WindCard extends State<WindCard> {
     super.initState();
   }
 
+  TextStyle speedStyle = const TextStyle(fontSize: 24);
+  TextStyle directionStyle = const TextStyle(fontSize: 14);
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.sizeOf(context).width * 0.5,
-      height: MediaQuery.sizeOf(context).height * 0.2,
-      child: Card(
+    return Card(
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
               const Text("Wind Speed", style: TextStyle(fontSize: 16, height: 1.75)),
               const Divider(),
-              Row(
-                children: [
-                  Text("${widget.windDirection}°"),
-                  Text("${widget.windSpeed} km/h"),
-                ],
+              Center(
+                heightFactor: 1.4,
+                child: Column(
+                  children: [
+                    Text("${widget.windSpeed} km/h", style: speedStyle),
+                    Text("Direction ${widget.windDirection}°", style: directionStyle),
+                  ],
+                )
               ),
             ],
           ),
         )
-      ),
     );
   }
 }

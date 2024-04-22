@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/Weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
+import 'package:weather_app/components/sunset_sunrise_card.dart';
 import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
@@ -202,13 +203,23 @@ class _CurrentWeather extends State<CurrentWeather> {
                           ),
                           HourlyWeatherCard(hourly: hourlyWeather!),
                           DailyWeatherCard(daily: dailyWeather!),
-                          Row(
-                            children: [
-                              WindCard(
-                                windDirection: currentWeather!.windDirection,
-                                windSpeed: currentWeather!.windSpeed
-                              )
-                            ],
+                          SizedBox(
+                            height: MediaQuery.sizeOf(context).height * 0.26,
+                            child: GridView.count(
+                              primary: false,
+                              crossAxisSpacing: 12,
+                              crossAxisCount: 2,
+                              children: [
+                                WindCard(
+                                  windDirection: currentWeather!.windDirection,
+                                  windSpeed: currentWeather!.windSpeed
+                                ),
+                                SunsetSunriseCard(
+                                    sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
+                                    sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
+                                )
+                              ],
+                            )
                           )
                         ]
                       )

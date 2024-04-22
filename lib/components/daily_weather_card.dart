@@ -80,7 +80,7 @@ class _DailyTile {
             Icon(icon, size: 30),
             SizedBox(
               width: 100,
-              child: Center( child: Text("${max.round()}° /${min.round()}°") ),
+              child: Center( child: Text("${max.round()}° / ${min.round()}°") ),
             ),
             IconedText(icon: Icons.water_drop, text: "${precipitationProbability.round()}%")
           ],
