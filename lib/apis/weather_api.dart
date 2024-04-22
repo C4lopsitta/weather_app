@@ -78,7 +78,7 @@ class WeatherApi{
 
   Future<Daily> call_api_daily() async {
     const path = "/v1/forecast";
-    String api_sunrise = ",";
+    /*String api_sunrise = ",";
     String api_sunset = ",";
     String api_uvIndex = ",";
     String api_precipitationProbability = ",";
@@ -90,7 +90,7 @@ class WeatherApi{
     if(dailyUvIndex == true)
       api_uvIndex = ",uv_index_max";
     if(dailyPrecipitationProbability == true)
-      api_precipitationProbability = ",precipitation_probability_max";
+      api_precipitationProbability = ",precipitation_probability_max";*/
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
