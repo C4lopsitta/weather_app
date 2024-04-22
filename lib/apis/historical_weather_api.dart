@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/forecast/historical/HistoricalWind.dart';
 
+import '../forecast/historical/HistoricalSun.dart';
 import '../forecast/historical/HistoricalTempetature.dart';
 import 'geo.dart';
 
@@ -68,5 +69,28 @@ class HistoricalWeatherApi{
         }
     );
     return HistoricalTemperature.fromJson(_responseJson);
+  }
+  Future<HistoricalSun> call_api_sun() async {
+    const path = "/v1/archive";
+
+    Map<String, dynamic> params = {
+      "longitude":"${geo?.lon}",
+      "latitude": "${geo?.lat}",
+      "start_date": dateFormatter.format(startDate),
+      "end_date": dateFormatter.format(endDate),
+
+      "daily": "sunrise,sunset,daylight_duration,sunshine_duration"
+    };
+    Uri uri = Uri.https(_api_url,path, params);
+    print(uri.query);
+    await http.get(uri).then(
+            (result){
+          if(result.statusCode != 200)
+            return null;
+          print("api call: " + result.body);
+          this._responseJson = json.decode(result.body);
+        }
+    );
+    return HistoricalSun.fromJson(_responseJson);
   }
 }
