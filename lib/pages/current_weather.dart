@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
+import 'package:weather_app/components/full_address_card.dart';
 import 'package:weather_app/components/sunset_sunrise_card.dart';
 import 'package:weather_app/components/uv_index_card.dart';
 import 'package:weather_app/components/weather_header.dart';
@@ -279,12 +280,13 @@ class _CurrentWeather extends State<CurrentWeather> {
                                 SunsetSunriseCard(
                                     sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
                                     sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
-                                )
+                                ),
                               ],
                             )
                           ),
                           const SizedBox(height: 12),
-                          UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255)
+                          UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
+                          FullAddressCard(address: _selectedGeo?.fullName ?? "")
                         ]
                       )
                     )
