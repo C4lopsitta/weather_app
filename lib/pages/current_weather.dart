@@ -221,7 +221,7 @@ class _CurrentWeather extends State<CurrentWeather> {
         children: [
           SizedBox(height: MediaQuery.of(context).viewPadding.top),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +261,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                 if(_selectedGeo != null )
                   if(isWeatherReady)
                     SizedBox(
-                      height: MediaQuery.of(context).size.height - 160
+                      height: MediaQuery.of(context).size.height - 148
                           - MediaQuery.of(context).viewPadding.top,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.vertical,
