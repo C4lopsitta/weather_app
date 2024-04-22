@@ -36,7 +36,7 @@ class WeatherApi{
       "latitude": "${geo?.lat}",
 
       "current": "temperature_2m,relative_humidity_2m,weather_code,apparent_temperature"
-        ",precipitation,wind_speed_10m,wind_direction_10m"
+        ",precipitation,wind_speed_10m,wind_direction_10m,"
     };
     Uri uri = Uri.https(api_url,path, params);
     print(uri.query);
@@ -50,7 +50,6 @@ class WeatherApi{
             // FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
         }
     );
-    print(Current.fromJson(this._responseJson).temperature);
     return Current.fromJson(this._responseJson);
   }
 
@@ -96,8 +95,8 @@ class WeatherApi{
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
 
-      "daily":"weather_code,temperature_2m_max,temperature_2m_min$api_sunrise"
-          "$api_sunset$api_uvIndex$api_precipitationProbability"
+      "daily":"weather_code,temperature_2m_max,temperature_2m_min,sunrise"
+          ",sunset,uv_index_max,precipitation_probability_max"
     };
     Uri uri = Uri.https(api_url,path, params);
     print(uri.query);
@@ -107,7 +106,7 @@ class WeatherApi{
             return null;
           print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
-          //print(this._responseJson);
+          print(this._responseJson);
 
           // FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
           }
