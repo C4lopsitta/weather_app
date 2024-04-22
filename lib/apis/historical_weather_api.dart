@@ -118,4 +118,28 @@ class HistoricalWeatherApi{
     );
     return HistoricalPrecipitation.fromJson(_responseJson);
   }
+
+  Future<List<dynamic>> call_api_weather_codes() async {
+    const path = "/v1/archive";
+
+    Map<String, dynamic> params = {
+      "longitude":"${geo?.lon}",
+      "latitude": "${geo?.lat}",
+      "start_date": dateFormatter.format(startDate),
+      "end_date": dateFormatter.format(endDate),
+
+      "daily": "precipitation_sum,rain_sum,snowfall_sum,precipitation_hours"
+    };
+    Uri uri = Uri.https(_api_url,path, params);
+    print(uri.query);
+    await http.get(uri).then(
+            (result){
+          if(result.statusCode != 200)
+            return null;
+          print("api call: " + result.body);
+          this._responseJson = json.decode(result.body);
+        }
+    );
+    return _responseJson["daily"]["weather_code"];
+  }
 }
