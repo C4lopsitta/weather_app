@@ -5,7 +5,7 @@ import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
 
 import 'apis/geo.dart';
-import 'forecast/Current.dart';
+import 'forecast/current.dart';
 
 void main() {
   runApp(const MyApp());

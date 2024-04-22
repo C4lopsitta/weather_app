@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:weather_app/forecast/Current.dart';
-import 'package:weather_app/forecast/Daily.dart';
-import '../forecast/Hourly.dart';
+import 'package:weather_app/forecast/current.dart';
+import 'package:weather_app/forecast/daily.dart';
+import '../forecast/hourly.dart';
 import 'geo.dart';
 
 class WeatherApi{

@@ -32,8 +32,12 @@ class _WindCard extends State<WindCard> {
             children: [
               const Text("Wind Speed", style: TextStyle(fontSize: 16, height: 1.75)),
               const Divider(),
-              Text("${widget.windSpeed}"),
-              Text(widget.windDirection)
+              Row(
+                children: [
+                  Text("${widget.windDirection}°"),
+                  Text("${widget.windSpeed} km/h"),
+                ],
+              ),
             ],
           ),
         )

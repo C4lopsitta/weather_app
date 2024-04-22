@@ -8,9 +8,9 @@ import 'package:weather_app/components/weather_header.dart';
 import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
 
-import '../forecast/Current.dart';
-import '../forecast/Daily.dart';
-import '../forecast/Hourly.dart';
+import '../forecast/current.dart';
+import '../forecast/daily.dart';
+import '../forecast/hourly.dart';
 
 class CurrentWeather extends StatefulWidget {
   const CurrentWeather({super.key});

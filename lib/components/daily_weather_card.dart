@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/components/icon_text.dart';
-import 'package:weather_app/forecast/Daily.dart';
-import 'package:weather_app/forecast/WeatherTranslator.dart';
+import 'package:weather_app/forecast/daily.dart';
+import 'package:weather_app/forecast/weather_translator.dart';
 
 class DailyWeatherCard extends StatefulWidget {
   DailyWeatherCard({

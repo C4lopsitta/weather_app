@@ -51,4 +51,8 @@ class WeatherTranslator{
       return "Thunderstorm";
     return "";
   }
+
+  static IconData windIconFromDegrees(String direction) {
+    return Icons.not_accessible_rounded;
+  }
 }

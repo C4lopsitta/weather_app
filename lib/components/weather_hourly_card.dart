@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/components/icon_text.dart';
-import 'package:weather_app/forecast/WeatherTranslator.dart';
-import '../forecast/Hourly.dart';
+import 'package:weather_app/forecast/weather_translator.dart';
+import '../forecast/hourly.dart';
 
 class HourlyWeatherCard extends StatefulWidget {
   HourlyWeatherCard({
