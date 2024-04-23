@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
@@ -92,13 +89,13 @@ class _CurrentWeather extends State<CurrentWeather> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Suggestions"),
+                            const Text("Suggestions"),
                             IconButton(
                                 onPressed: () {
                                   sheetContext = null;
                                   Navigator.pop(context);
                                 },
-                                icon: Icon(Icons.close_rounded)
+                                icon: const Icon(Icons.close_rounded)
                             )
                           ],
                         )
@@ -244,7 +241,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                       String text = _searchTextController.text;
                       _getSuggestions(text).then((value) => _openSheet());
                     },
-                  ) ],
+                  ),  ],
                   leading: (_isGettingLocation) ?
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),

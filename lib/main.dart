@@ -4,9 +4,6 @@ import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
 import 'package:weather_app/preferences_storage.dart';
 
-import 'apis/geo.dart';
-import 'forecast/current.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -48,9 +45,9 @@ class _ApplicationRoot extends State<ApplicationRoot> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: [
-          CurrentWeather(),
-          HistoricalWeather(),
-          Settings()
+          const CurrentWeather(),
+          const HistoricalWeather(),
+          const Settings()
         ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) { setState((){ currentPageIndex = index; }); },
