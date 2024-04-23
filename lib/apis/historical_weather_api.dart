@@ -15,7 +15,7 @@ class HistoricalWeatherApi{
   DateFormat _dateFormatter = DateFormat.yMd();
   DateTime startDate = DateTime(2024);
   DateTime endDate = DateTime(2024);
-  final _api_url = "https://archive-api.open-meteo.com";
+  final _api_url = "archive-api.open-meteo.com";
 
   HistoricalWeatherApi({
     this.geo,
