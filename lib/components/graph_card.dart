@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/forecast/historical/graph_list_component.dart';
 
 class GraphCard extends StatefulWidget {
   GraphCard({
@@ -13,8 +14,17 @@ class GraphCard extends StatefulWidget {
 
   DateTime graphStart;
   DateTime graphEnd;
-  List<List<double>> graphY;
+  List<GraphListComponent> graphY;
   String title;
+
+  List<Color> lineColors = [
+    Colors.redAccent,
+    Colors.yellow,
+    Colors.blueAccent,
+    Colors.teal,
+    Colors.pink,
+    Colors.green
+  ];
 
   @override
   State<StatefulWidget> createState() => _GraphCard();
@@ -57,7 +67,7 @@ class _GraphCard extends State<GraphCard> {
           sideTitles: SideTitles(
             showTitles: true,
             interval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
-            reservedSize: (type < 2) ? 25 : 35,
+            reservedSize: (type < 2) ? 25 : 45,
             getTitlesWidget: (value, meta) {
               return RotatedBox(
                 quarterTurns: -3,
@@ -78,6 +88,22 @@ class _GraphCard extends State<GraphCard> {
         )
       )
     );
+  }
+
+  List<Widget> _buildLegendList() {
+    List<Widget> widgets = [];
+
+    for(int i = 0; i < widget.graphY.length; i++) {
+      widgets.add(Row(
+        children: [
+          Icon(Icons.circle, color: widget.lineColors[i]),
+          const SizedBox(width: 8),
+          Text(widget.graphY[i].title)
+        ],
+      ));
+    }
+
+    return widgets;
   }
 
   LineChartData mainData() {
@@ -186,7 +212,9 @@ class _GraphCard extends State<GraphCard> {
                   ),
                 ),
               ),
-            ],
+              const Divider(),
+              const Text("Legend", style: TextStyle(fontSize: 12)),
+            ] + _buildLegendList(),
           )
         )
       )

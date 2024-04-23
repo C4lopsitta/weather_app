@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/apis/historical_weather_api.dart';
 import 'package:weather_app/components/graph_card.dart';
+import 'package:weather_app/forecast/historical/graph_list_component.dart';
+import 'package:weather_app/forecast/historical/historical_precipitation.dart';
+import 'package:weather_app/forecast/historical/historical_sun.dart';
+import 'package:weather_app/forecast/historical/historical_tempetature.dart';
+import 'package:weather_app/forecast/historical/historical_wind.dart';
 
 import '../apis/geo.dart';
 import '../preferences_storage.dart';
@@ -42,6 +47,17 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   DateFormat formatter = DateFormat.yMd();
 
   bool isWeatherReady = false;
+
+  HistoricalPrecipitation? precipitation;
+  HistoricalSun? sun;
+  HistoricalTemperature? temperature;
+  HistoricalWind? wind;
+
+  List<Object?> HistoricalStuff = [
+    null, null, null, null
+  ];
+
+  final List<String> CardTitles = ["Temperature", "Precipitation", "Sunshine", "Wind"];
   //endregion
 
 
@@ -177,6 +193,10 @@ class _HistoricalWeather extends State<HistoricalWeather> {
 
     HistoricalWeatherApi weather = HistoricalWeatherApi(geo: _selectedGeo, startDate: _start, endDate: _end);
 
+    HistoricalStuff[0] = await weather.call_api_temperature();
+    HistoricalStuff[1] = await weather.call_api_precipitation();
+    HistoricalStuff[2] = await weather.call_api_sun();
+    HistoricalStuff[3] =  await weather.call_api_wind();
 
     lastWeatherUpdate = DateTime.now();
 
@@ -191,8 +211,6 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     _startDateController.text = formatter.format(_start);
     _endDateController.text = formatter.format(_end);
   }
-
-  TextStyle headerStyle = const TextStyle(fontSize: 14);
 
   Future showDateDialog(DateTime date, BuildContext context, { bool isStart = false }) async {
     DateTime? newDate = await showDatePicker(
@@ -214,6 +232,12 @@ class _HistoricalWeather extends State<HistoricalWeather> {
       setState(() {});
     }
   }
+
+  List<GraphListComponent> convertApiToComponents(int index) {
+    return [];
+  }
+
+  TextStyle headerStyle = const TextStyle(fontSize: 14);
 
   @override
   Widget build(BuildContext context) {
@@ -324,12 +348,12 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                       child: GraphCard(
                         graphStart: _start,
                         graphEnd: _end,
-                        graphY: [[12.0, 11.0, 14.0]],
-                        title: "Giovanni",
+                        graphY: convertApiToComponents(index),
+                        title: CardTitles[index],
                       )
                     );
                   },
-                  childCount: 10
+                  childCount: CardTitles.length
                 )
               ),
             ],
