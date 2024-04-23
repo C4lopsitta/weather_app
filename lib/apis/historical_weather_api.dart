@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:weather_app/forecast/historical/HistoricalWind.dart';
+import 'package:weather_app/forecast/historical/historical_wind.dart';
 
-import '../forecast/historical/HistoricalPrecipitation.dart';
-import '../forecast/historical/HistoricalSun.dart';
-import '../forecast/historical/HistoricalTempetature.dart';
+import '../forecast/historical/historical_precipitation.dart';
+import '../forecast/historical/historical_sun.dart';
+import '../forecast/historical/historical_tempetature.dart';
 import 'geo.dart';
 
 class HistoricalWeatherApi{

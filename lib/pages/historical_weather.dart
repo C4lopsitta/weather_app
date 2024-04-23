@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/apis/historical_weather_api.dart';
 import 'package:weather_app/components/graph_card.dart';
 
 import '../apis/geo.dart';
@@ -174,6 +175,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   Future _getWeatherForSelectedGeo() async {
     if(_selectedGeo == null) return;
 
+    HistoricalWeatherApi weather = HistoricalWeatherApi(geo: _selectedGeo, startDate: _start, endDate: _end);
 
 
     lastWeatherUpdate = DateTime.now();
