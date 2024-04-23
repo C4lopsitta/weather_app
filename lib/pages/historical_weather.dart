@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/components/graph_card.dart';
 
 class HistoricalWeather extends StatefulWidget {
   const HistoricalWeather({super.key});
@@ -156,9 +157,17 @@ class _HistoricalWeather extends State<HistoricalWeather> {
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
-                    return const Text("Banana", style: TextStyle(fontSize: 600));
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: GraphCard(
+                        graphStart: _start,
+                        graphEnd: _end,
+                        graphY: [[12.0, 11.0, 14.0]],
+                        title: "Giovanni",
+                      )
+                    );
                   },
-                  childCount: 1
+                  childCount: 10
                 )
               ),
             ],

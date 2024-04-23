@@ -5,7 +5,6 @@ class HistoricalPrecipitation{
   List<dynamic> snowfallSums;
   List<dynamic> precipitationHours;
 
-
   HistoricalPrecipitation(this.times, this.precipitationSums, this.rainSums,
       this.snowfallSums, this.precipitationHours);
 
