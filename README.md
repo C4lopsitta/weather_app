@@ -2,21 +2,22 @@
 
 Weather application using open-meteo.com API
 
-## Getting Started
+## Geolocation
+the geolocation uses the OpenStreeMaps API and the forecast location can be selected using a searchbar
+or by your actual positon
 
-This project is a starting point for a Flutter application.
+## ScreenShots
+![app icon](/images/app_icon.png)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![Current Weather](/images/current_weather.png)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+![Current Weather](/images/current_weather.png)
+
+
 
 ## APIs used
 - [Geocoding API from OpenStreetMaps](https://nominatim.org)
 - [Weather API](https://open-meteo.com/)
-
-
+- [Historical Weather API](https://archive-api.open-meteo.com)
