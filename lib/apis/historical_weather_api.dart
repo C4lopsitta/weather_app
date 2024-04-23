@@ -12,9 +12,9 @@ import 'geo.dart';
 class HistoricalWeatherApi{
   Map<String, dynamic> _responseJson = {};
   Geo? geo = Geo(44.59703140, 7.61142170);
-  DateFormat _dateFormatter = DateFormat.yMd();
-  DateTime startDate = DateTime(2024);
-  DateTime endDate = DateTime(2024);
+  DateFormat _dateFormatter = DateFormat("yyyy-MM-dd");
+  DateTime startDate = DateTime(2024,01,01);
+  DateTime endDate = DateTime(2024,02,02);
   final _api_url = "archive-api.open-meteo.com";
 
   HistoricalWeatherApi({
@@ -25,7 +25,6 @@ class HistoricalWeatherApi{
 
   Future<HistoricalWind> call_api_wind() async {
     const path = "/v1/archive";
-
     Map<String, dynamic> params = {
       "longitude":"${geo?.lon}",
       "latitude": "${geo?.lat}",
@@ -34,6 +33,7 @@ class HistoricalWeatherApi{
 
       "daily": "wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant"
     };
+
     Uri uri = Uri.https(_api_url,path, params);
     print(uri.query);
     await http.get(uri).then(
@@ -63,9 +63,9 @@ class HistoricalWeatherApi{
     print(uri.query);
     await http.get(uri).then(
             (result){
-          if(result.statusCode != 200)
+          if(result.statusCode != 200){
             return null;
-          print("api call: " + result.body);
+          }
           this._responseJson = json.decode(result.body);
         }
     );
