@@ -230,6 +230,14 @@ class _HistoricalWeather extends State<HistoricalWeather> {
       }
 
       updateText();
+
+      if(_selectedGeo != null) {
+        setState(() {
+          isWeatherReady = false;
+        });
+        _getWeatherForSelectedGeo();
+      }
+
       setState(() {});
     }
   }
@@ -240,57 +248,57 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     if(index == 0) {
       HistoricalTemperature temp = (ApiResults[index] as HistoricalTemperature);
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMax as List<double>,
+          list: temp.apparentTemperatureMax ,
           title: "Apparent maximum temperature"
       ));
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMean as List<double>,
+          list: temp.apparentTemperatureMean ,
           title: "Apparent mean temperature"
       ));
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMin as List<double>,
+          list: temp.apparentTemperatureMin ,
           title: "Apparent minimum temperature"
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMax as List<double>,
+          list: temp.temperatureMax ,
           title: "Maximum temperature"
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMean as List<double>,
+          list: temp.temperatureMean ,
           title: "Mean temperature"
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMin as List<double>,
+          list: temp.temperatureMin ,
           title: "Minimum temperature"
       ));
     }
     else if (index == 1) {
       HistoricalPrecipitation precipitation = (ApiResults[index] as HistoricalPrecipitation);
       components.add(GraphListComponent(
-          list: precipitation.rainSums as List<double>,
+          list: precipitation.rainSums ,
           title: "Total rainfall"
       ));
       components.add(GraphListComponent(
-          list: precipitation.snowfallSums as List<double>,
+          list: precipitation.snowfallSums ,
           title: "Total snowfall"
       ));
       components.add(GraphListComponent(
-          list: precipitation.precipitationHours as List<double>,
+          list: precipitation.precipitationHours ,
           title: "Hours of precipitation"
       ));
       components.add(GraphListComponent(
-          list: precipitation.precipitationSums as List<double>,
+          list: precipitation.precipitationSums ,
           title: "Total precipitation"
       ));
     }
     else if (index == 2) {
       HistoricalSun sun = (ApiResults[index] as HistoricalSun);
       components.add(GraphListComponent(
-          list: sun.daylightDurations as List<double>,
+          list: sun.daylightDurations,
           title: "Duration of daylight"
       ));
       components.add(GraphListComponent(
-          list: sun.sunshineDurations as List<double>,
+          list: sun.sunshineDurations,
           title: "Duration of sunshine"
       ));
       //todo)) figure something for sunrise/sunset
@@ -298,15 +306,15 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     else {
       HistoricalWind wind = (ApiResults[index] as HistoricalWind);
       components.add(GraphListComponent(
-          list: wind.windSpeeds as List<double>,
+          list: wind.windSpeeds ,
           title: "Speed of wind"
       ));
       components.add(GraphListComponent(
-          list: wind.windGusts as List<double>,
+          list: wind.windGusts ,
           title: "Wind gusts"
       ));
       components.add(GraphListComponent(
-          list: wind.windDirections as List<double>,
+          list: wind.windDirections ,
           title: "Direction of wind"
       ));
     }
@@ -402,7 +410,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                                         border: const OutlineInputBorder(),
                                         label: const Text("Date End"),
                                         suffixIcon: IconButton(
-                                          icon: const Icon(Icons.pool_rounded),
+                                          icon: const Icon(Icons.last_page_rounded),
                                           onPressed: () { showDateDialog(_end, context); },
                                         ),
                                       ),
@@ -418,23 +426,39 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                   ),
                 ),
               ),
-              if(isWeatherReady)
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                        child: GraphCard(
-                          graphStart: _start,
-                          graphEnd: _end,
-                          graphY: convertApiToComponents(index),
-                          title: CardTitles[index],
-                        )
-                      );
-                    },
-                    childCount: CardTitles.length
+              if(_selectedGeo != null)
+                if(isWeatherReady)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                          child: GraphCard(
+                            graphStart: _start,
+                            graphEnd: _end,
+                            graphY: convertApiToComponents(index),
+                            title: CardTitles[index],
+                          )
+                        );
+                      },
+                      childCount: CardTitles.length
+                    )
                   )
-                ),
+                else SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => const Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(48),
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: CircularProgressIndicator(),
+                        )
+                      )
+                    ),
+                    childCount: 1
+                  ),
+                )
             ],
           )
         )

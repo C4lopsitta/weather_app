@@ -17,11 +17,14 @@ class GraphCard extends StatefulWidget {
   List<GraphListComponent> graphY;
   String title;
 
+  double graphMin = 0;
+  double graphMax = 0;
+
   List<Color> lineColors = [
-    Colors.redAccent,
-    Colors.yellow,
+    const Color.fromARGB(255, 255, 10, 5),
     Colors.blueAccent,
-    Colors.teal,
+    Colors.yellow,
+    Colors.deepOrange,
     Colors.pink,
     Colors.green
   ];
@@ -31,19 +34,33 @@ class GraphCard extends StatefulWidget {
 }
 
 class _GraphCard extends State<GraphCard> {
+  @override
+  void initState() {
+    super.initState();
+    widget.graphY.forEach((list) {
+      list.list.forEach((value) {
+        if((value ?? 0) * 1.0 > widget.graphMax) widget.graphMax = (value ?? 0) * 1.0;
+        if((value ?? 0) * 1.0 < widget.graphMin) widget.graphMin = (value ?? 0) * 1.0;
+      });
+    });
+
+    widget.graphMax += 1;
+    widget.graphMin -= 1;
+  }
+
   LineChartData buildData() {
     var (range, type) = _GraphUtilities.getRangeSize(widget.graphStart, widget.graphEnd);
 
     return LineChartData(
       minX: 0,
-      minY: 0,
+      minY: widget.graphMin,
       maxX: range * 1.0,
-      maxY: 10,
+      maxY: widget.graphMax,
 
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
-        horizontalInterval: 1,
+        horizontalInterval: (widget.graphMax < 50) ? 1 : (widget.graphMax < 150) ? 25 : (widget.graphMax < 1000) ? 100 : 1000,
         verticalInterval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
@@ -59,6 +76,7 @@ class _GraphCard extends State<GraphCard> {
         }
       ),
 
+      //TODO)) Fix vertical tile
       titlesData: FlTitlesData(
         show: true,
         rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -67,11 +85,11 @@ class _GraphCard extends State<GraphCard> {
           sideTitles: SideTitles(
             showTitles: true,
             interval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
-            reservedSize: (type < 2) ? 25 : 45,
+            reservedSize: (type < 2) ? 28 : 48,
             getTitlesWidget: (value, meta) {
               return RotatedBox(
                 quarterTurns: -3,
-                child: Text(_GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value), style: graphLabel),
+                child: Text(" ${_GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value)}", style: graphLabel),
               );
             }
           )
@@ -79,115 +97,78 @@ class _GraphCard extends State<GraphCard> {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 10,
+            interval: 1000000,
             reservedSize: 30,
             getTitlesWidget: (value, meta) {
-              return Text('abc', style: graphLabel);
+              return Text('', style: graphLabel);
             }
           )
         )
-      )
+      ),
+
+      borderData: FlBorderData(
+        show: true,
+        border: Border.all(color: Colors.white10),
+      ),
+
+      lineBarsData: _buildChartData(),
     );
+  }
+
+  List<LineChartBarData> _buildChartData() {
+    List<LineChartBarData> barData = [];
+    int index = 0;
+
+    widget.graphY.forEach((line) {
+      barData.add(LineChartBarData(
+        spots: _buildLineSpots(line),
+        isCurved: false,
+        barWidth: 3,
+        isStrokeCapRound: true,
+        color: widget.lineColors[index],
+        belowBarData: BarAreaData( show: false ),
+        dotData: const FlDotData( show: true ),
+        aboveBarData: BarAreaData( show: false ),
+      ));
+      index++;
+    });
+
+    return barData;
+  }
+
+  List<FlSpot> _buildLineSpots(GraphListComponent line) {
+    List<FlSpot> spots = [];
+    double index = 0;
+
+    line.list.forEach((value) {
+      spots.add(FlSpot(
+        index, (value ?? 0) * 1.0
+      ));
+
+
+      index += (1 / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd));
+    });
+
+    return spots;
   }
 
   List<Widget> _buildLegendList() {
     List<Widget> widgets = [];
 
     for(int i = 0; i < widget.graphY.length; i++) {
-      widgets.add(Row(
-        children: [
-          Icon(Icons.circle, color: widget.lineColors[i]),
-          const SizedBox(width: 8),
-          Text(widget.graphY[i].title)
-        ],
+      widgets.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Row(
+          children: [
+            Icon(Icons.circle, color: widget.lineColors[i], size: 12),
+            const SizedBox(width: 8),
+            Text(widget.graphY[i].title, style: const TextStyle(fontSize: 10))
+          ],
+        )
       ));
     }
 
     return widgets;
-  }
-
-  LineChartData mainData() {
-    return LineChartData(
-      gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-        horizontalInterval: 1,
-        verticalInterval: 10,
-        getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Colors.red,
-            strokeWidth: 1,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Colors.red,
-            strokeWidth: 1,
-          );
-        },
-      ),
-
-      titlesData: FlTitlesData(
-        show: true,
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            interval: 10,
-            getTitlesWidget: (value, meta) {
-              return RotatedBox(
-                quarterTurns: -3,
-                child: Text("${value.round()}"),
-              );
-            }
-          ),
-        ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: 1,
-            reservedSize: 42,
-          ),
-        ),
-      ),
-
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: const Color(0xff37434d)),
-      ),
-      minX: 0,
-      maxX: (2024 - 1940),
-      minY: 0,
-      maxY: 6,
-      lineBarsData: [
-        LineChartBarData(
-          spots: const [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
-          ],
-          isCurved: false,
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-          ),
-        ),
-      ],
-    );
   }
 
   TextStyle title = const TextStyle(fontSize: 16, height: 1.75);
@@ -224,13 +205,14 @@ class _GraphCard extends State<GraphCard> {
 
 class _GraphUtilities {
   static (int, int) getRangeSize(DateTime start, DateTime end) {
+    //TODO)) Fix this (always return total days)
     if(start.isAfter(end)) return (0, 0);
 
     int days = _getDaysInRange(start, end);
     if(days < 20) return (days, 0);
 
     int months = _getMonthsInRange(start, end);
-    if(months < 20) return (months, 1);
+    if(months < 20) return (months * 11, 1);
 
     return (_getYearsInRange(start, end), 2);
   }

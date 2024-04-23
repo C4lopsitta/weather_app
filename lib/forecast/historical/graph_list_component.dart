@@ -4,6 +4,16 @@ class GraphListComponent {
     required this.title
   });
 
-  List<double> list;
+  List<dynamic> list;
   String title;
+
+  double max() {
+    double max = double.negativeInfinity;
+
+    list.forEach((element) {
+      if(element > max) max = element;
+    });
+
+    return max;
+  }
 }
