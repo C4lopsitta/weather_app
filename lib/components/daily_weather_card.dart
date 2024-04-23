@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/components/icon_text.dart';
 import 'package:weather_app/forecast/daily.dart';
@@ -77,12 +78,19 @@ class _DailyTile {
               width: 30,
               child: Center( child: Text(day) ),
             ),
-            Icon(icon, size: 30),
+            SizedBox(
+              width: 45,
+              child: Icon(icon, size: 30),
+            ),
             SizedBox(
               width: 100,
               child: Center( child: Text("${max.round()}° / ${min.round()}°") ),
             ),
-            IconedText(icon: Icons.water_drop, text: "${precipitationProbability.round()}%")
+            Container(
+              alignment: AlignmentDirectional.centerStart,
+              width: 75,
+              child: IconedText(icon: Icons.water_drop, text: "${precipitationProbability.round()}%")
+            )
           ],
         ),
       )
