@@ -8,7 +8,11 @@ or by your actual positon
 
 ## ScreenShots
 ![app icon](/images/app_icon.png)
+
+
 ![Current Weather](/images/current_weather.png)
+
+
 ![Current Weather](/images/current_weather.png)
 
 
