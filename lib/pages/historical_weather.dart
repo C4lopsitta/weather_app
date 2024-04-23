@@ -24,7 +24,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     super.initState();
     _start = DateTime.fromMillisecondsSinceEpoch(_end.millisecondsSinceEpoch - (65536 * 128));
     updateText();
-    loadFromStorage();
+    // loadFromStorage();
   }
 
 
@@ -53,7 +53,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   HistoricalTemperature? temperature;
   HistoricalWind? wind;
 
-  List<Object?> HistoricalStuff = [
+  List<Object?> ApiResults = [
     null, null, null, null
   ];
 
@@ -62,31 +62,32 @@ class _HistoricalWeather extends State<HistoricalWeather> {
 
 
   Future loadFromStorage() async {
-    print("Loading!");
-
-    await PreferencesStorage.initialize();
-
-    if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
-      return _geocodeCurrentLocation();
-    }
-
-    //load last geo (if exists)
-    int? lastLoadTimeFromStorage = await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD);
-    if(lastLoadTimeFromStorage == null) return;
-    String? city = await PreferencesStorage.readString(PreferencesStorage.GEO_CITY);
-    String? fullName = await PreferencesStorage.readString(PreferencesStorage.GEO_FULLNAME);
-    double? lat = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LAT);
-    double? lon = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LON);
-
-    setState(() {
-      _selectedGeo = Geo(lat ?? 0.0, lon ?? 0.0, city: city, fullName: fullName);
-      lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(lastLoadTimeFromStorage);
-    });
-
-    print("Loaded!");
-
-    _searchTextController.text = city ?? "";
-    _getWeatherForSelectedGeo();
+    return;
+    // print("Loading!");
+    //
+    // await PreferencesStorage.initialize();
+    //
+    // if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
+    //   return _geocodeCurrentLocation();
+    // }
+    //
+    // //load last geo (if exists)
+    // int? lastLoadTimeFromStorage = await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD);
+    // if(lastLoadTimeFromStorage == null) return;
+    // String? city = await PreferencesStorage.readString(PreferencesStorage.GEO_CITY);
+    // String? fullName = await PreferencesStorage.readString(PreferencesStorage.GEO_FULLNAME);
+    // double? lat = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LAT);
+    // double? lon = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LON);
+    //
+    // setState(() {
+    //   _selectedGeo = Geo(lat ?? 0.0, lon ?? 0.0, city: city, fullName: fullName);
+    //   lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(lastLoadTimeFromStorage);
+    // });
+    //
+    // print("Loaded!");
+    //
+    // _searchTextController.text = city ?? "";
+    // _getWeatherForSelectedGeo();
   }
 
   void _openSheet() {
@@ -193,10 +194,10 @@ class _HistoricalWeather extends State<HistoricalWeather> {
 
     HistoricalWeatherApi weather = HistoricalWeatherApi(geo: _selectedGeo, startDate: _start, endDate: _end);
 
-    HistoricalStuff[0] = await weather.call_api_temperature();
-    HistoricalStuff[1] = await weather.call_api_precipitation();
-    HistoricalStuff[2] = await weather.call_api_sun();
-    HistoricalStuff[3] =  await weather.call_api_wind();
+    ApiResults[0] = await weather.call_api_temperature();
+    ApiResults[1] = await weather.call_api_precipitation();
+    ApiResults[2] = await weather.call_api_sun();
+    ApiResults[3] =  await weather.call_api_wind();
 
     lastWeatherUpdate = DateTime.now();
 
@@ -234,7 +235,84 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   }
 
   List<GraphListComponent> convertApiToComponents(int index) {
-    return [];
+    List<GraphListComponent> components = [];
+
+    if(index == 0) {
+      HistoricalTemperature temp = (ApiResults[index] as HistoricalTemperature);
+      components.add(GraphListComponent(
+          list: temp.apparentTemperatureMax as List<double>,
+          title: "Apparent maximum temperature"
+      ));
+      components.add(GraphListComponent(
+          list: temp.apparentTemperatureMean as List<double>,
+          title: "Apparent mean temperature"
+      ));
+      components.add(GraphListComponent(
+          list: temp.apparentTemperatureMin as List<double>,
+          title: "Apparent minimum temperature"
+      ));
+      components.add(GraphListComponent(
+          list: temp.temperatureMax as List<double>,
+          title: "Maximum temperature"
+      ));
+      components.add(GraphListComponent(
+          list: temp.temperatureMean as List<double>,
+          title: "Mean temperature"
+      ));
+      components.add(GraphListComponent(
+          list: temp.temperatureMin as List<double>,
+          title: "Minimum temperature"
+      ));
+    }
+    else if (index == 1) {
+      HistoricalPrecipitation precipitation = (ApiResults[index] as HistoricalPrecipitation);
+      components.add(GraphListComponent(
+          list: precipitation.rainSums as List<double>,
+          title: "Total rainfall"
+      ));
+      components.add(GraphListComponent(
+          list: precipitation.snowfallSums as List<double>,
+          title: "Total snowfall"
+      ));
+      components.add(GraphListComponent(
+          list: precipitation.precipitationHours as List<double>,
+          title: "Hours of precipitation"
+      ));
+      components.add(GraphListComponent(
+          list: precipitation.precipitationSums as List<double>,
+          title: "Total precipitation"
+      ));
+    }
+    else if (index == 2) {
+      HistoricalSun sun = (ApiResults[index] as HistoricalSun);
+      components.add(GraphListComponent(
+          list: sun.daylightDurations as List<double>,
+          title: "Duration of daylight"
+      ));
+      components.add(GraphListComponent(
+          list: sun.sunshineDurations as List<double>,
+          title: "Duration of sunshine"
+      ));
+      //todo)) figure something for sunrise/sunset
+    }
+    else {
+      HistoricalWind wind = (ApiResults[index] as HistoricalWind);
+      components.add(GraphListComponent(
+          list: wind.windSpeeds as List<double>,
+          title: "Speed of wind"
+      ));
+      components.add(GraphListComponent(
+          list: wind.windGusts as List<double>,
+          title: "Wind gusts"
+      ));
+      components.add(GraphListComponent(
+          list: wind.windDirections as List<double>,
+          title: "Direction of wind"
+      ));
+    }
+    //todo)) do something with directions
+    
+    return components;
   }
 
   TextStyle headerStyle = const TextStyle(fontSize: 14);
@@ -340,22 +418,23 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                   ),
                 ),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      child: GraphCard(
-                        graphStart: _start,
-                        graphEnd: _end,
-                        graphY: convertApiToComponents(index),
-                        title: CardTitles[index],
-                      )
-                    );
-                  },
-                  childCount: CardTitles.length
-                )
-              ),
+              if(isWeatherReady)
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                        child: GraphCard(
+                          graphStart: _start,
+                          graphEnd: _end,
+                          graphY: convertApiToComponents(index),
+                          title: CardTitles[index],
+                        )
+                      );
+                    },
+                    childCount: CardTitles.length
+                  )
+                ),
             ],
           )
         )
