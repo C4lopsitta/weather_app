@@ -69,6 +69,7 @@ class HistoricalWeatherApi{
           this._responseJson = json.decode(result.body);
         }
     );
+    print(_responseJson);
     return HistoricalTemperature.fromJson(_responseJson);
   }
   Future<HistoricalSun> call_api_sun() async {

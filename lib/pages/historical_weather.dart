@@ -57,6 +57,9 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     null, null, null, null
   ];
 
+  bool _apiError = false;
+  String _apiMessage = "";
+
   final List<String> CardTitles = ["Temperature", "Precipitation", "Sunshine", "Wind"];
   //endregion
 
@@ -192,12 +195,25 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   Future _getWeatherForSelectedGeo() async {
     if(_selectedGeo == null) return;
 
+    setState(() {
+      _apiError = false;
+    });
+
     HistoricalWeatherApi weather = HistoricalWeatherApi(geo: _selectedGeo, startDate: _start, endDate: _end);
 
-    ApiResults[0] = await weather.call_api_temperature();
-    ApiResults[1] = await weather.call_api_precipitation();
-    ApiResults[2] = await weather.call_api_sun();
-    ApiResults[3] =  await weather.call_api_wind();
+    try {
+      ApiResults[0] = await weather.call_api_temperature();
+      ApiResults[1] = await weather.call_api_precipitation();
+      ApiResults[2] = await weather.call_api_sun();
+      ApiResults[3] = await weather.call_api_wind();
+    } catch (ex) {
+      print("Las exceptiones: ${ex.toString()}");
+
+      setState(() {
+        _apiError = true;
+        _apiMessage = (ex as Error).stackTrace.toString();
+      });
+    }
 
     lastWeatherUpdate = DateTime.now();
 
@@ -444,21 +460,38 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                       childCount: CardTitles.length
                     )
                   )
-                else SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(48),
-                        child: SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: CircularProgressIndicator(),
-                        )
-                      )
-                    ),
-                    childCount: 1
-                  ),
-                )
+                else
+                  if(!_apiError)
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(48),
+                            child: SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: CircularProgressIndicator(),
+                            )
+                          )
+                        ),
+                        childCount: 1
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) => Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              const Text("API Error!"),
+                              Expanded(child: Text(_apiMessage))
+                            ],
+                          ),
+                        ),
+                        childCount: 1
+                      ),
+                    )
             ],
           )
         )

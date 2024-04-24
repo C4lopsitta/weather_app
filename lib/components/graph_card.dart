@@ -54,7 +54,7 @@ class _GraphCard extends State<GraphCard> {
     return LineChartData(
       minX: 0,
       minY: widget.graphMin,
-      maxX: range * 1.0,
+      maxX: (widget.graphY[0].list.length / (widget.graphY[0].list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
       maxY: widget.graphMax,
 
       gridData: FlGridData(
