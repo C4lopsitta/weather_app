@@ -140,13 +140,15 @@ class _GraphCard extends State<GraphCard> {
     List<FlSpot> spots = [];
     double index = 0;
 
+    double itemsPerGap = line.list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd);
+    double itemOffset = 1 / itemsPerGap;
+
     line.list.forEach((value) {
       spots.add(FlSpot(
         index, (value ?? 0) * 1.0
       ));
 
-
-      index += (1 / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd));
+      index += itemOffset;
     });
 
     return spots;
@@ -212,7 +214,7 @@ class _GraphUtilities {
     if(days < 20) return (days, 0);
 
     int months = _getMonthsInRange(start, end);
-    if(months < 20) return (months * 11, 1);
+    if(months < 20) return (months, 1);
 
     return (_getYearsInRange(start, end), 2);
   }

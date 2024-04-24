@@ -40,7 +40,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   DateTime lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(0);
 
   late DateTime _start;
-  DateTime _end = DateTime.now();
+  DateTime _end = DateTime.now().subtract(const Duration(days: 2));
 
   Geo? _selectedGeo;
 
@@ -217,7 +217,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     DateTime? newDate = await showDatePicker(
       context: context,
       firstDate: (isStart) ? DateTime(1940) : _start,
-      lastDate: (!isStart) ? DateTime.now() : _end,
+      lastDate: (!isStart) ? DateTime.now().subtract(const Duration(days: 2)) : _end,
       initialDate: date,
       initialEntryMode: DatePickerEntryMode.calendarOnly
     );
@@ -448,7 +448,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) => const Center(
                       child: Padding(
-                        padding: const EdgeInsets.all(48),
+                        padding: EdgeInsets.all(48),
                         child: SizedBox(
                           width: 48,
                           height: 48,
