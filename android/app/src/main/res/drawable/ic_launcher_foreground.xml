@@ -5,5 +5,7 @@
         android:bottom="12dp"
         android:left="12dp"
         android:right="12dp"
-        android:top="12dp" />
+        android:top="12dp">
+        <bitmap android:gravity="center" android:src="@mipmap/ic_launcher_foreground" />
+    </padding>
 </shape>

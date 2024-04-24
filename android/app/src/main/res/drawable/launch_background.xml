@@ -4,9 +4,15 @@
     <item android:drawable="@android:color/transparent" />
 
     <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+<!--    <padding android:top="12dp"-->
+<!--        android:left="12dp"-->
+<!--        android:right="12dp"-->
+<!--        android:bottom="12dp">-->
+        <item>
+            <bitmap
+                android:gravity="center"
+                android:antialias="true"
+                android:src="@mipmap/ic_launcher_foreground" />
+        </item>
+<!--    </padding>-->
 </layer-list>
