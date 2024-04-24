@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/components/switch_row_preference.dart';
+import 'package:weather_app/enum/speed_unit.dart';
+import 'package:weather_app/enum/temperature_unit.dart';
 import 'package:weather_app/preferences_storage.dart';
 
 class Settings extends StatefulWidget {
@@ -13,6 +15,10 @@ class Settings extends StatefulWidget {
 
 class _Settings extends State<Settings> {
   TextStyle titleStyle = const TextStyle(fontSize: 16, height: 2);
+  TextStyle subTitleStyle = const TextStyle(fontSize: 14, height: 3);
+
+  TemperatureUnit selectedTemperatureUnit = TemperatureUnit.CELSIUS;
+  SpeedUnit selectedWindSpeedUnit = SpeedUnit.KMH;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +40,65 @@ class _Settings extends State<Settings> {
                   },
                   child: const Text("Delete current last location")
               ),
+              const Divider(),
               Text("Common weather settings", style: titleStyle),
 
 
+              Text("Temperature Unit", style: subTitleStyle),
+              SegmentedButton(
+                segments: const <ButtonSegment<TemperatureUnit>>[
+                  ButtonSegment<TemperatureUnit>(
+                    value: TemperatureUnit.CELSIUS,
+                    label: Text("Celsius"),
+                    icon: Icon(Icons.device_thermostat_rounded)
+                  ),
+                  ButtonSegment<TemperatureUnit>(
+                    value: TemperatureUnit.FARENHEIT,
+                    label: Text("Fahrenheit"),
+                    icon: Icon(Icons.device_thermostat_rounded)
+                  ),
+                  ButtonSegment<TemperatureUnit>(
+                    value: TemperatureUnit.KELVIN,
+                    label: Text("Kelvin"),
+                    icon: Icon(Icons.device_thermostat_rounded)
+                  )
+                ],
+                selected: {selectedTemperatureUnit},
+                onSelectionChanged: (selections) {
+                  setState(() { selectedTemperatureUnit = selections.first; });
+                },
+                multiSelectionEnabled: false,
+              ),
+
+              Text("Wind speed unit", style: subTitleStyle),
+              SegmentedButton(
+                segments: <ButtonSegment<SpeedUnit>>[
+                  ButtonSegment(
+                    value: SpeedUnit.KMH,
+                    label: Text(SpeedUnit.KMH.unitToLabel()),
+                    icon: const Icon(Icons.wind_power_rounded)
+                  ),
+                  ButtonSegment(
+                      value: SpeedUnit.MPH,
+                      label: Text(SpeedUnit.MPH.unitToLabel()),
+                      icon: const Icon(Icons.wind_power_rounded)
+                  ),
+                  ButtonSegment(
+                      value: SpeedUnit.MS,
+                      label: Text(SpeedUnit.MS.unitToLabel()),
+                      icon: const Icon(Icons.wind_power_rounded)
+                  )
+                ],
+                selected: {selectedWindSpeedUnit},
+                onSelectionChanged: (selections) {
+                  setState(() { selectedWindSpeedUnit = selections.first; });
+                },
+              ),
+
+              const Divider(),
               Text("Current weather settings", style: titleStyle),
 
+              const Divider(),
               Text("Historical weather settings", style: titleStyle),
 
             ]
