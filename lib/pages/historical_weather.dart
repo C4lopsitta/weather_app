@@ -63,7 +63,6 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   final List<String> CardTitles = ["Temperature", "Precipitation", "Sunshine", "Wind"];
   //endregion
 
-
   Future loadFromStorage() async {
     return;
     // print("Loading!");
