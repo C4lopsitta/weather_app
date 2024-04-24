@@ -22,7 +22,6 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   @override
   void initState() {
     super.initState();
-    _start = DateTime.fromMillisecondsSinceEpoch(_end.millisecondsSinceEpoch - (65536 * 128));
     updateText();
     // loadFromStorage();
   }
@@ -39,7 +38,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   bool _isGettingSuggestions = false;
   DateTime lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(0);
 
-  late DateTime _start;
+  DateTime _start = DateTime.now().subtract(const Duration(days: 5));
   DateTime _end = DateTime.now().subtract(const Duration(days: 2));
 
   Geo? _selectedGeo;
