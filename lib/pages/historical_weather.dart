@@ -461,8 +461,17 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                           child: Card(
-                            child: Center(
-                              child: Text("Error getting ${CardTitles[index]}"),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                children: [
+                                  Text("Error getting ${CardTitles[index]}"),
+                                  const Text("API error message"),
+                                  Expanded(
+                                    child: Text(_apiMessage),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         );
