@@ -447,14 +447,24 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
+                        if(ApiResults[index] != null) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                            child: GraphCard(
+                              graphStart: _start,
+                              graphEnd: _end,
+                              graphY: convertApiToComponents(index),
+                              title: CardTitles[index],
+                            )
+                          );
+                        }
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                          child: GraphCard(
-                            graphStart: _start,
-                            graphEnd: _end,
-                            graphY: convertApiToComponents(index),
-                            title: CardTitles[index],
-                          )
+                          child: Card(
+                            child: Center(
+                              child: Text("Error getting ${CardTitles[index]}"),
+                            ),
+                          ),
                         );
                       },
                       childCount: CardTitles.length
