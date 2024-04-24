@@ -8,13 +8,13 @@ class GraphCard extends StatefulWidget {
     super.key,
     required this.graphStart,
     required this.graphEnd,
-    required this.graphY,
+    required this.graphLines,
     required this.title
   });
 
   DateTime graphStart;
   DateTime graphEnd;
-  List<GraphListComponent> graphY;
+  List<GraphListComponent> graphLines;
   String title;
 
   double graphMin = 0;
@@ -37,7 +37,7 @@ class _GraphCard extends State<GraphCard> {
   @override
   void initState() {
     super.initState();
-    widget.graphY.forEach((list) {
+    widget.graphLines.forEach((list) {
       list.list.forEach((value) {
         if((value ?? 0) * 1.0 > widget.graphMax) widget.graphMax = (value ?? 0) * 1.0;
         if((value ?? 0) * 1.0 < widget.graphMin) widget.graphMin = (value ?? 0) * 1.0;
@@ -54,7 +54,7 @@ class _GraphCard extends State<GraphCard> {
     return LineChartData(
       minX: 0,
       minY: widget.graphMin,
-      maxX: (widget.graphY[0].list.length / (widget.graphY[0].list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
+      maxX: (widget.graphLines[0].list.length / (widget.graphLines[0].list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
       maxY: widget.graphMax,
 
       gridData: FlGridData(
@@ -119,7 +119,7 @@ class _GraphCard extends State<GraphCard> {
     List<LineChartBarData> barData = [];
     int index = 0;
 
-    widget.graphY.forEach((line) {
+    widget.graphLines.forEach((line) {
       barData.add(LineChartBarData(
         spots: _buildLineSpots(line),
         isCurved: false,
@@ -157,14 +157,14 @@ class _GraphCard extends State<GraphCard> {
   List<Widget> _buildLegendList() {
     List<Widget> widgets = [];
 
-    for(int i = 0; i < widget.graphY.length; i++) {
+    for(int i = 0; i < widget.graphLines.length; i++) {
       widgets.add(Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Row(
           children: [
             Icon(Icons.circle, color: widget.lineColors[i], size: 12),
             const SizedBox(width: 8),
-            Text(widget.graphY[i].title, style: const TextStyle(fontSize: 10))
+            Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
           ],
         )
       ));

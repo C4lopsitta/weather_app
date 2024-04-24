@@ -453,7 +453,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                             child: GraphCard(
                               graphStart: _start,
                               graphEnd: _end,
-                              graphY: convertApiToComponents(index),
+                              graphLines: convertApiToComponents(index),
                               title: CardTitles[index],
                             )
                           );
