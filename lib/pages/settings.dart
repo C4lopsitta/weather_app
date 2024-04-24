@@ -12,7 +12,7 @@ class Settings extends StatefulWidget {
 }
 
 class _Settings extends State<Settings> {
-
+  TextStyle titleStyle = const TextStyle(fontSize: 16, height: 2);
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +22,10 @@ class _Settings extends State<Settings> {
       children: [
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
           child: Column(
             children: [
-              const Text("Location settings"),
+              Text("Location settings", style: titleStyle),
               const SwitchRowPreference(preference: SettingPreferences.USE_GPS_DEFAULT, text: "Always load GPS location"),
               const SwitchRowPreference(preference: SettingPreferences.DONT_OVERWRITE_LOCATION, text: "Keep first location as default"),
               OutlinedButton(
@@ -33,7 +33,14 @@ class _Settings extends State<Settings> {
                     await PreferencesStorage.drop(PreferencesStorage.GEO_LAST_LOAD);
                   },
                   child: const Text("Delete current last location")
-              )
+              ),
+              Text("Common weather settings", style: titleStyle),
+
+
+              Text("Current weather settings", style: titleStyle),
+
+              Text("Historical weather settings", style: titleStyle),
+
             ]
           )
         )
