@@ -6,6 +6,7 @@ class GraphListComponent {
 
   List<dynamic> list;
   String title;
+  bool ignoreInDraw = false;
 
   double max() {
     double max = double.negativeInfinity;

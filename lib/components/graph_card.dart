@@ -120,17 +120,19 @@ class _GraphCard extends State<GraphCard> {
     int index = 0;
 
     widget.graphLines.forEach((line) {
-      barData.add(LineChartBarData(
-        spots: _buildLineSpots(line),
-        isCurved: false,
-        barWidth: 3,
-        isStrokeCapRound: true,
-        color: widget.lineColors[index],
-        belowBarData: BarAreaData( show: false ),
-        dotData: const FlDotData( show: true ),
-        aboveBarData: BarAreaData( show: false ),
-      ));
-      index++;
+      if(!line.ignoreInDraw) {
+        barData.add(LineChartBarData(
+          spots: _buildLineSpots(line),
+          isCurved: false,
+          barWidth: 3,
+          isStrokeCapRound: true,
+          color: widget.lineColors[index],
+          belowBarData: BarAreaData(show: false),
+          dotData: const FlDotData(show: true),
+          aboveBarData: BarAreaData(show: false),
+        ));
+        index++;
+      }
     });
 
     return barData;
@@ -160,12 +162,19 @@ class _GraphCard extends State<GraphCard> {
     for(int i = 0; i < widget.graphLines.length; i++) {
       widgets.add(Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Row(
-          children: [
-            Icon(Icons.circle, color: widget.lineColors[i], size: 12),
-            const SizedBox(width: 8),
-            Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
-          ],
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              widget.graphLines[i].ignoreInDraw = !widget.graphLines[i].ignoreInDraw;
+            });
+          },
+          child: Row(
+            children: [
+              Icon((widget.graphLines[i].ignoreInDraw) ? Icons.circle_outlined : Icons.circle, color: widget.lineColors[i], size: 14),
+              const SizedBox(width: 8),
+              Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
+            ],
+          )
         )
       ));
     }
