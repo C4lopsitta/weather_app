@@ -245,14 +245,6 @@ class _HistoricalWeather extends State<HistoricalWeather> {
       }
 
       updateText();
-
-      if(_selectedGeo != null) {
-        setState(() {
-          isWeatherReady = false;
-        });
-        _getWeatherForSelectedGeo();
-      }
-
       setState(() {});
     }
   }
@@ -342,178 +334,186 @@ class _HistoricalWeather extends State<HistoricalWeather> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: MediaQuery.of(context).viewPadding.top),
-        SizedBox(
-          height: MediaQuery.of(context).size.height - MediaQuery.of(context).viewPadding.top - 80,
-          child: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                pinned: true,
-                leadingWidth: 0,
-                expandedHeight: 160,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.all(12),
-                  collapseMode: CollapseMode.none,
-                  expandedTitleScale: 1,
-                  title: Container(
-                    alignment: Alignment.center,
-                    child: Column(
-                      children: [
-                        SearchBar(
-                          controller: _searchTextController,
-                          onSubmitted: (text) {
-                            _getSuggestions(text).then((value) => _openSheet());
-                          },
-                          trailing: [ IconButton(
-                            icon: (!_isGettingSuggestions) ?
-                            const Icon(Icons.search_rounded) :
-                            const SizedBox(
-                                height: 24,
-                                width: 24,
-                                child: CircularProgressIndicator()
-                            ),
-                            onPressed: () {
-                              String text = _searchTextController.text;
+    return RefreshIndicator(
+      onRefresh: () async {
+        if(_selectedGeo != null && isWeatherReady == true) {
+          setState(() { isWeatherReady = false; });
+          _getWeatherForSelectedGeo();
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: MediaQuery.of(context).viewPadding.top),
+          SizedBox(
+            height: MediaQuery.of(context).size.height - MediaQuery.of(context).viewPadding.top - 80,
+            child: CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  pinned: true,
+                  leadingWidth: 0,
+                  expandedHeight: 160,
+                  flexibleSpace: FlexibleSpaceBar(
+                    titlePadding: const EdgeInsets.all(12),
+                    collapseMode: CollapseMode.none,
+                    expandedTitleScale: 1,
+                    title: Container(
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          SearchBar(
+                            controller: _searchTextController,
+                            onSubmitted: (text) {
                               _getSuggestions(text).then((value) => _openSheet());
                             },
-                          ) ],
-                          leading: (_isGettingLocation) ?
-                          const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: SizedBox(
+                            trailing: [ IconButton(
+                              icon: (!_isGettingSuggestions) ?
+                              const Icon(Icons.search_rounded) :
+                              const SizedBox(
                                   height: 24,
                                   width: 24,
                                   child: CircularProgressIndicator()
-                              )
-                          ) : IconButton(
-                            icon: const Icon(Icons.location_on_rounded),
-                            onPressed: () => _geocodeCurrentLocation(),
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 70,
-                                width: MediaQuery.sizeOf(context).width,
-                                child: GridView.count(
-                                  crossAxisCount: 2,
-                                  primary: false,
-                                  crossAxisSpacing: 12,
-                                  clipBehavior: Clip.none,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  children: [
-                                    TextField(
-                                      controller: _startDateController,
-                                      decoration: InputDecoration(
-                                        border: const OutlineInputBorder(),
-                                        label: const Text("Date start"),
-                                        suffixIcon: IconButton(
-                                          icon: const Icon(Icons.start),
-                                          onPressed: () { showDateDialog(_start, context, isStart: true); },
-                                        ),
-                                      ),
-                                    ),
-                                    TextField(
-                                      controller: _endDateController,
-                                      decoration: InputDecoration(
-                                        border: const OutlineInputBorder(),
-                                        label: const Text("Date End"),
-                                        suffixIcon: IconButton(
-                                          icon: const Icon(Icons.last_page_rounded),
-                                          onPressed: () { showDateDialog(_end, context); },
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                )
-                              )
-                            ],
-                          )
-                        )
-                      ],
-                    )
-                  ),
-                ),
-              ),
-              if(_selectedGeo != null)
-                if(isWeatherReady)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                        if(ApiResults[index] != null) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                            child: GraphCard(
-                              graphStart: _start,
-                              graphEnd: _end,
-                              graphLines: convertApiToComponents(index),
-                              title: CardTitles[index],
-                            )
-                          );
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                          child: Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                children: [
-                                  Text("Error getting ${CardTitles[index]}"),
-                                  const Text("API error message"),
-                                  Expanded(
-                                    child: Text(_apiMessage),
-                                  )
-                                ],
                               ),
+                              onPressed: () {
+                                String text = _searchTextController.text;
+                                _getSuggestions(text).then((value) => _openSheet());
+                              },
+                            ) ],
+                            leading: (_isGettingLocation) ?
+                            const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator()
+                                )
+                            ) : IconButton(
+                              icon: const Icon(Icons.location_on_rounded),
+                              onPressed: () => _geocodeCurrentLocation(),
                             ),
                           ),
-                        );
-                      },
-                      childCount: CardTitles.length
-                    )
-                  )
-                else
-                  if(!_apiError)
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) => const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(48),
-                            child: SizedBox(
-                              width: 48,
-                              height: 48,
-                              child: CircularProgressIndicator(),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: 70,
+                                  width: MediaQuery.sizeOf(context).width,
+                                  child: GridView.count(
+                                    crossAxisCount: 2,
+                                    primary: false,
+                                    crossAxisSpacing: 12,
+                                    clipBehavior: Clip.none,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    children: [
+                                      TextField(
+                                        controller: _startDateController,
+                                        decoration: InputDecoration(
+                                          border: const OutlineInputBorder(),
+                                          label: const Text("Date start"),
+                                          suffixIcon: IconButton(
+                                            icon: const Icon(Icons.start),
+                                            onPressed: () { showDateDialog(_start, context, isStart: true); },
+                                          ),
+                                        ),
+                                      ),
+                                      TextField(
+                                        controller: _endDateController,
+                                        decoration: InputDecoration(
+                                          border: const OutlineInputBorder(),
+                                          label: const Text("Date End"),
+                                          suffixIcon: IconButton(
+                                            icon: const Icon(Icons.last_page_rounded),
+                                            onPressed: () { showDateDialog(_end, context); },
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                                )
+                              ],
                             )
                           )
-                        ),
-                        childCount: 1
-                      ),
-                    )
-                  else
+                        ],
+                      )
+                    ),
+                  ),
+                ),
+                if(_selectedGeo != null)
+                  if(isWeatherReady)
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
-                        (context, index) => Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            children: [
-                              const Text("API Error!"),
-                              Expanded(child: Text(_apiMessage))
-                            ],
-                          ),
-                        ),
-                        childCount: 1
-                      ),
+                        (BuildContext context, int index) {
+                          if(ApiResults[index] != null) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                              child: GraphCard(
+                                graphStart: _start,
+                                graphEnd: _end,
+                                graphLines: convertApiToComponents(index),
+                                title: CardTitles[index],
+                              )
+                            );
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                            child: Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  children: [
+                                    Text("Error getting ${CardTitles[index]}"),
+                                    const Text("API error message"),
+                                    Expanded(
+                                      child: Text(_apiMessage),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: CardTitles.length
+                      )
                     )
-            ],
+                  else
+                    if(!_apiError)
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(48),
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: CircularProgressIndicator(),
+                              )
+                            )
+                          ),
+                          childCount: 1
+                        ),
+                      )
+                    else
+                      SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                const Text("API Error!"),
+                                Expanded(child: Text(_apiMessage))
+                              ],
+                            ),
+                          ),
+                          childCount: 1
+                        ),
+                      )
+              ],
+            )
           )
-        )
-      ],
+        ],
+      )
     );
   }
 }
