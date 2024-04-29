@@ -20,15 +20,6 @@ class GraphCard extends StatefulWidget {
   double graphMin = 0;
   double graphMax = 0;
 
-  List<Color> lineColors = [
-    const Color.fromARGB(255, 255, 10, 5),
-    Colors.blueAccent,
-    Colors.yellow,
-    Colors.deepOrange,
-    Colors.pink,
-    Colors.green
-  ];
-
   @override
   State<StatefulWidget> createState() => _GraphCard();
 }
@@ -126,7 +117,7 @@ class _GraphCard extends State<GraphCard> {
           isCurved: false,
           barWidth: 3,
           isStrokeCapRound: true,
-          color: widget.lineColors[index],
+          color: line.color,
           belowBarData: BarAreaData(show: false),
           dotData: const FlDotData(show: true),
           aboveBarData: BarAreaData(show: false),
@@ -170,7 +161,7 @@ class _GraphCard extends State<GraphCard> {
           },
           child: Row(
             children: [
-              Icon((widget.graphLines[i].ignoreInDraw) ? Icons.circle_outlined : Icons.circle, color: widget.lineColors[i], size: 14),
+              Icon((widget.graphLines[i].ignoreInDraw) ? Icons.circle_outlined : Icons.circle, color: widget.graphLines[i].color, size: 14),
               const SizedBox(width: 8),
               Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
             ],

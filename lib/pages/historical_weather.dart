@@ -254,74 +254,88 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     if(index == 0) {
       HistoricalTemperature temp = (ApiResults[index] as HistoricalTemperature);
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMax ,
-          title: "Apparent maximum temperature"
+        list: temp.apparentTemperatureMax ,
+        title: "Apparent maximum temperature",
+        color: GraphListComponent.colors[0]
       ));
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMean ,
-          title: "Apparent mean temperature"
+        list: temp.apparentTemperatureMean ,
+        title: "Apparent mean temperature",
+          color: GraphListComponent.colors[1]
       ));
       components.add(GraphListComponent(
-          list: temp.apparentTemperatureMin ,
-          title: "Apparent minimum temperature"
+        list: temp.apparentTemperatureMin ,
+        title: "Apparent minimum temperature",
+          color: GraphListComponent.colors[2]
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMax ,
-          title: "Maximum temperature"
+        list: temp.temperatureMax ,
+        title: "Maximum temperature",
+          color: GraphListComponent.colors[3]
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMean ,
-          title: "Mean temperature"
+        list: temp.temperatureMean ,
+        title: "Mean temperature",
+          color: GraphListComponent.colors[4]
       ));
       components.add(GraphListComponent(
-          list: temp.temperatureMin ,
-          title: "Minimum temperature"
+        list: temp.temperatureMin ,
+        title: "Minimum temperature",
+          color: GraphListComponent.colors[5]
       ));
     }
     else if (index == 1) {
       HistoricalPrecipitation precipitation = (ApiResults[index] as HistoricalPrecipitation);
       components.add(GraphListComponent(
-          list: precipitation.rainSums ,
-          title: "Total rainfall"
+        list: precipitation.rainSums ,
+        title: "Total rainfall",
+          color: GraphListComponent.colors[0]
+      ));
+      components.add(GraphListComponent(list: precipitation.snowfallSums ,
+        title: "Total snowfall",
+          color: GraphListComponent.colors[1]
       ));
       components.add(GraphListComponent(
-          list: precipitation.snowfallSums ,
-          title: "Total snowfall"
+        list: precipitation.precipitationHours,
+        title: "Hours of precipitation",
+          color: GraphListComponent.colors[2]
       ));
       components.add(GraphListComponent(
-          list: precipitation.precipitationHours ,
-          title: "Hours of precipitation"
-      ));
-      components.add(GraphListComponent(
-          list: precipitation.precipitationSums ,
-          title: "Total precipitation"
+        list: precipitation.precipitationSums ,
+        title: "Total precipitation",
+          color: GraphListComponent.colors[3]
       ));
     }
     else if (index == 2) {
       HistoricalSun sun = (ApiResults[index] as HistoricalSun);
       components.add(GraphListComponent(
-          list: sun.daylightDurations,
-          title: "Duration of daylight"
+        list: sun.daylightDurations,
+        title: "Duration of daylight",
+          color: GraphListComponent.colors[0]
       ));
       components.add(GraphListComponent(
-          list: sun.sunshineDurations,
-          title: "Duration of sunshine"
+        list: sun.sunshineDurations,
+        title: "Duration of sunshine",
+          color: GraphListComponent.colors[1]
       ));
       //todo)) figure something for sunrise/sunset
     }
     else {
       HistoricalWind wind = (ApiResults[index] as HistoricalWind);
       components.add(GraphListComponent(
-          list: wind.windSpeeds ,
-          title: "Speed of wind"
+        list: wind.windSpeeds ,
+        title: "Speed of wind",
+          color: GraphListComponent.colors[0]
       ));
       components.add(GraphListComponent(
-          list: wind.windGusts ,
-          title: "Wind gusts"
+        list: wind.windGusts ,
+        title: "Wind gusts",
+          color: GraphListComponent.colors[1]
       ));
       components.add(GraphListComponent(
-          list: wind.windDirections ,
-          title: "Direction of wind"
+        list: wind.windDirections ,
+        title: "Direction of wind",
+          color: GraphListComponent.colors[2]
       ));
     }
     //todo)) do something with directions
