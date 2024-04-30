@@ -1,6 +1,8 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 class NetworkManager {
-  static bool isOnline() {
-    //TODO)) Implement
-    return true;
+  static Future<bool> isOnline() async {
+    var status = await Connectivity().checkConnectivity();
+    return (status.contains(ConnectivityResult.none)) ? false : true;
   }
 }

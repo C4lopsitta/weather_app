@@ -1,8 +1,8 @@
-import 'dart:io';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
+import 'package:weather_app/apis/network_manager.dart';
 import 'package:weather_app/apis/weather_api.dart';
 import 'package:weather_app/components/daily_weather_card.dart';
 import 'package:weather_app/components/full_address_card.dart';
@@ -26,7 +26,7 @@ class CurrentWeather extends StatefulWidget {
 
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
-  Geo? _selectedGeo;
+  Geo? selectedGeo;
   BuildContext? sheetContext;
   bool isGettingLocation = false;
   bool isGettingSuggestions = false;
@@ -64,14 +64,36 @@ class _CurrentWeather extends State<CurrentWeather> {
     double? lon = await PreferencesStorage.readDouble(PreferencesStorage.GEO_LON);
 
     setState(() {
-      _selectedGeo = Geo(lat ?? 0.0, lon ?? 0.0, city: city, fullName: fullName);
+      selectedGeo = Geo(lat ?? 0.0, lon ?? 0.0, city: city, fullName: fullName);
       lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(lastLoadTimeFromStorage);
     });
 
     print("Loaded!");
 
     _searchTextController.text = city ?? "";
-    getWeatherForSelectedGeo();
+
+    bool isOnline = await NetworkManager.isOnline();
+    if(isOnline) {
+      getWeatherForSelectedGeo();
+    } else {
+      SnackBar snackbar = SnackBar(
+        content: const Text("No connection"),
+        margin: const EdgeInsets.all(12),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: "Retry",
+          onPressed: () {
+            if(selectedGeo != null) {
+              getWeatherForSelectedGeo();
+            }
+          },
+        )
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+
+      //TODO)) Add loader from file
+
+    }
   }
 
   void openSheet() {
@@ -137,7 +159,7 @@ class _CurrentWeather extends State<CurrentWeather> {
           onTap: () {
             Geo self = geo;
             setState(() {
-              _selectedGeo = self;
+              selectedGeo = self;
               if(geo.city != null) _searchTextController.text = geo.city!;
               isWeatherReady = false;
               errorEncountered = null;
@@ -168,7 +190,7 @@ class _CurrentWeather extends State<CurrentWeather> {
       setState(() {
         if(current.city != null) _searchTextController.text = current.city!;
         isGettingLocation = false;
-        _selectedGeo = current;
+        selectedGeo = current;
       });
 
     } catch(exception) {
@@ -180,10 +202,10 @@ class _CurrentWeather extends State<CurrentWeather> {
   }
 
   Future getWeatherForSelectedGeo() async {
-    if(_selectedGeo == null) return;
+    if(selectedGeo == null) return;
 
     try {
-      WeatherApi current = WeatherApi(geo: _selectedGeo!);
+      WeatherApi current = WeatherApi(geo: selectedGeo!);
       currentWeather = await current.call_api_current();
       dailyWeather = await current.call_api_daily();
       hourlyWeather = await current.call_api_hourly();
@@ -213,10 +235,10 @@ class _CurrentWeather extends State<CurrentWeather> {
     if(await PreferencesStorage.readBoolean(SettingPreferences.DONT_OVERWRITE_LOCATION) == true &&
        await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD) != null) return;
 
-    await PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, _selectedGeo!.city ?? "");
-    await PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, _selectedGeo!.fullName ?? "");
-    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, _selectedGeo!.lat);
-    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, _selectedGeo!.lon);
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, selectedGeo!.city ?? "");
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, selectedGeo!.fullName ?? "");
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, selectedGeo!.lat);
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, selectedGeo!.lon);
     await PreferencesStorage.writeInteger(PreferencesStorage.GEO_LAST_LOAD, lastWeatherUpdate.millisecondsSinceEpoch);
 
     print("Stored Geo");
@@ -228,7 +250,7 @@ class _CurrentWeather extends State<CurrentWeather> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        if(_selectedGeo != null && isWeatherReady == true) {
+        if(selectedGeo != null && isWeatherReady == true) {
           setState(() { isWeatherReady = false; });
           getWeatherForSelectedGeo();
         }
@@ -277,7 +299,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                       onPressed: () => geocodeCurrentLocation(),
                     ),
                 ),
-                if(_selectedGeo != null)
+                if(selectedGeo != null)
                   if(isWeatherReady && ( errorEncountered == null || (errorEncountered?.isEmpty ?? true) ))
                     SizedBox(
                       height: MediaQuery.of(context).size.height - 148
@@ -288,7 +310,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             WeatherHeader(
-                              city: _selectedGeo!.city,
+                              city: selectedGeo!.city,
                               temperature: currentWeather!.temperature,
                               status: currentWeather!.weatherCode,
                               minTemp: dailyWeather!.minTemperature[0],
@@ -321,7 +343,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                             const SizedBox(height: 12),
                             UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
                             const SizedBox(height: 12),
-                            FullAddressCard(address: _selectedGeo?.fullName ?? ""),
+                            FullAddressCard(address: selectedGeo?.fullName ?? ""),
                             const SizedBox(height: 24)
                           ]
                         )
@@ -341,7 +363,7 @@ class _CurrentWeather extends State<CurrentWeather> {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  if(_selectedGeo != null && isWeatherReady == true) {
+                                  if(selectedGeo != null && isWeatherReady == true) {
                                     setState(() { isWeatherReady = false; });
                                     getWeatherForSelectedGeo();
                                   }
