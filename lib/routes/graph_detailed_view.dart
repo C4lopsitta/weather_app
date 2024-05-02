@@ -155,7 +155,6 @@ class _GraphDetailedView extends State<GraphDetailedView> {
     return spots;
   }
 
-  //TODO)) Fix broken icon toggle
   void openSheet() {
     showModalBottomSheet(
         context: context,
@@ -163,7 +162,8 @@ class _GraphDetailedView extends State<GraphDetailedView> {
         enableDrag: true,
         clipBehavior: Clip.hardEdge,
         builder: (context) {
-          return SizedBox(
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setter) => SizedBox(
               width: MediaQuery.sizeOf(context).width,
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -173,18 +173,19 @@ class _GraphDetailedView extends State<GraphDetailedView> {
                     children: <Widget>[
                       const Text("Legend", style: TextStyle(fontSize: 18, height: 2)),
                       const Divider(),
-                    ] + _buildLegendList() + [
+                    ] + _buildLegendList(setter) + [
                       const SizedBox(height: 12),
                       const Text("Tap on an item to hide it", style: TextStyle(height: 1.5)),
                     ],
                 ),
               )
+            )
           );
         }
     );
   }
 
-  List<Widget> _buildLegendList() {
+  List<Widget> _buildLegendList(StateSetter setter) {
     List<Widget> widgets = [];
 
     for(int i = 0; i < widget.graphLines.length; i++) {
@@ -192,8 +193,12 @@ class _GraphDetailedView extends State<GraphDetailedView> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           child: GestureDetector(
               onTap: () {
+                bool newState = !widget.graphLines[i].ignoreInDraw;
                 setState(() {
-                  widget.graphLines[i].ignoreInDraw = !widget.graphLines[i].ignoreInDraw;
+                  widget.graphLines[i].ignoreInDraw = newState;
+                });
+                setter(() {
+                  widget.graphLines[i].ignoreInDraw = newState;
                 });
               },
               child: Row(
