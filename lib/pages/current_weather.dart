@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
@@ -13,6 +12,7 @@ import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
 import 'package:weather_app/preferences_storage.dart';
 
+import '../apis/network_manager.dart';
 import '../forecast/current.dart';
 import '../forecast/daily.dart';
 import '../forecast/hourly.dart';
