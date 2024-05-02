@@ -17,8 +17,8 @@ class GraphCard extends StatefulWidget {
   List<GraphListComponent> graphLines;
   String title;
 
-  double graphMin = 0;
-  double graphMax = 0;
+  late final double graphMin;
+  late final double graphMax;
 
   @override
   State<StatefulWidget> createState() => _GraphCard();
@@ -184,7 +184,17 @@ class _GraphCard extends State<GraphCard> {
           padding: const EdgeInsets.all(12),
             child: Column(
             children: [
-              Text(widget.title, style: title),
+              Row(
+                children: [
+                  Text(widget.title, style: title),
+                  IconButton(
+                    onPressed: () {
+
+                    },
+                    icon: const Icon(Icons.open_in_full_rounded)
+                  )
+                ],
+              ),
               const Divider(),
               AspectRatio(
                 aspectRatio: 1.333333333333333,

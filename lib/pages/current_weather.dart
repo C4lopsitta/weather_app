@@ -89,7 +89,9 @@ class _CurrentWeather extends State<CurrentWeather> {
           },
         )
       );
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      }
 
       //TODO)) Add loader from file
 
