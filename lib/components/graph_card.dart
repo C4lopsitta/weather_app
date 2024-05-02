@@ -1,7 +1,10 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/forecast/historical/graph_list_component.dart';
+
+import '../routes/graph_detailed_view.dart';
 
 class GraphCard extends StatefulWidget {
   GraphCard({
@@ -10,7 +13,20 @@ class GraphCard extends StatefulWidget {
     required this.graphEnd,
     required this.graphLines,
     required this.title
-  });
+  }) {
+    double min = 0;
+    double max = 0;
+
+    graphLines.forEach((list) {
+      list.list.forEach((value) {
+        if((value ?? 0) * 1.0 > max) max = (value ?? 0) * 1.0;
+        if((value ?? 0) * 1.0 < min) min = (value ?? 0) * 1.0;
+      });
+    });
+
+    graphMax = max + 1;
+    graphMin = min - 1;
+  }
 
   DateTime graphStart;
   DateTime graphEnd;
@@ -28,15 +44,6 @@ class _GraphCard extends State<GraphCard> {
   @override
   void initState() {
     super.initState();
-    widget.graphLines.forEach((list) {
-      list.list.forEach((value) {
-        if((value ?? 0) * 1.0 > widget.graphMax) widget.graphMax = (value ?? 0) * 1.0;
-        if((value ?? 0) * 1.0 < widget.graphMin) widget.graphMin = (value ?? 0) * 1.0;
-      });
-    });
-
-    widget.graphMax += 1;
-    widget.graphMin -= 1;
   }
 
   LineChartData buildData() {
@@ -184,15 +191,28 @@ class _GraphCard extends State<GraphCard> {
           padding: const EdgeInsets.all(12),
             child: Column(
             children: [
-              Row(
+              Stack(
+                alignment: Alignment.center,
                 children: [
                   Text(widget.title, style: title),
-                  IconButton(
-                    onPressed: () {
-
-                    },
-                    icon: const Icon(Icons.open_in_full_rounded)
+                  Container(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) =>
+                                GraphDetailedView(
+                                  graphStart: widget.graphStart,
+                                  graphEnd: widget.graphEnd,
+                                  graphLines: widget.graphLines,
+                                  title: widget.title,
+                                )));
+                        },
+                        icon: const Icon(Icons.open_in_full_rounded)
+                    )
                   )
+
                 ],
               ),
               const Divider(),
