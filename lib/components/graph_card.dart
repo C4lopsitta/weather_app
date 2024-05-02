@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:weather_app/forecast/historical/graph_list_component.dart';
 
 import '../routes/graph_detailed_view.dart';
+import 'graph_utilities.dart';
 
 class GraphCard extends StatefulWidget {
   GraphCard({
@@ -47,19 +48,19 @@ class _GraphCard extends State<GraphCard> {
   }
 
   LineChartData buildData() {
-    var (range, type) = _GraphUtilities.getRangeSize(widget.graphStart, widget.graphEnd);
+    var (range, type) = GraphUtilities.getRangeSize(widget.graphStart, widget.graphEnd);
 
     return LineChartData(
       minX: 0,
       minY: widget.graphMin,
-      maxX: (widget.graphLines[0].list.length / (widget.graphLines[0].list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
+      maxX: (widget.graphLines[0].list.length / (widget.graphLines[0].list.length / GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
       maxY: widget.graphMax,
 
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
         horizontalInterval: (widget.graphMax < 50) ? 1 : (widget.graphMax < 150) ? 25 : (widget.graphMax < 1000) ? 100 : 1000,
-        verticalInterval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
+        verticalInterval: GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: Colors.blueGrey,
@@ -82,12 +83,12 @@ class _GraphCard extends State<GraphCard> {
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
+            interval: GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
             reservedSize: (type < 2) ? 28 : 48,
             getTitlesWidget: (value, meta) {
               return RotatedBox(
                 quarterTurns: -3,
-                child: Text(" ${_GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value)}", style: graphLabel),
+                child: Text(" ${GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value)}", style: graphLabel),
               );
             }
           )
@@ -140,7 +141,7 @@ class _GraphCard extends State<GraphCard> {
     List<FlSpot> spots = [];
     double index = 0;
 
-    double itemsPerGap = line.list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd);
+    double itemsPerGap = line.list.length / GraphUtilities.getXGap(widget.graphStart, widget.graphEnd);
     double itemOffset = 1 / itemsPerGap;
 
     line.list.forEach((value) {
@@ -235,78 +236,4 @@ class _GraphCard extends State<GraphCard> {
   }
 }
 
-class _GraphUtilities {
-  static (int, int) getRangeSize(DateTime start, DateTime end) {
-    //TODO)) Fix this (always return total days)
-    if(start.isAfter(end)) return (0, 0);
 
-    int days = _getDaysInRange(start, end);
-    if(days < 20) return (days, 0);
-
-    int months = _getMonthsInRange(start, end);
-    if(months < 20) return (months, 1);
-
-    return (_getYearsInRange(start, end), 2);
-  }
-
-  static String getHorizontalLabel(DateTime start, DateTime end, int type, double offset) {
-    if(type == 0) { // day range
-      if(end.month == start.month) return "${start.day + offset.round()}";
-      else {
-        DateTime showedDate = start.add(Duration(days: offset.round()));
-        DateFormat formatter = DateFormat.Md();
-        if(start.year != end.year) formatter = DateFormat.yMd();
-        return formatter.format(showedDate);
-      }
-    }
-    if(type == 1) { // month range
-      DateTime showedDate = start.add(Duration(days: (29.8 * offset).round()));
-      DateFormat formatter = DateFormat.Md();
-      if(start.year != end.year) formatter = DateFormat.yMd();
-      return formatter.format(showedDate);
-    }
-    if(type == 2) {
-      DateFormat formatter = DateFormat.yM();
-      DateTime showedDate = start.add(Duration(days: (365 * offset).round()));
-      return formatter.format(showedDate);
-    }
-    return "";
-  }
-
-  static int getXGap(DateTime start, DateTime end) {
-    int range = getRangeSize(start, end).$1;
-
-    if(range < 24) return 1;
-    if(range < 180) return 10;
-    return 100;
-  }
-
-  static int _getDaysInRange(DateTime start, DateTime end) {
-    Duration duration = end.difference(start);
-    return duration.inDays;
-  }
-
-  static int _getMonthsInRange(DateTime start, DateTime end) {
-    int startYear = start.year;
-    int endYear = end.year;
-    int startMonth = start.month;
-    int endMonth = end.month;
-
-    int totalMonths = 0;
-
-    for(int year = startYear; year <= endYear; year++) {
-      for(int i = (year == startYear) ? startMonth : 1; i <= ((year == endYear) ? endMonth : 12); i++) {
-        totalMonths++;
-      }
-    }
-
-    return totalMonths;
-  }
-
-  static int _getYearsInRange(DateTime start, DateTime end) {
-    int startYear = start.year;
-    int endYear = end.year;
-
-    return endYear - startYear;
-  }
-}
