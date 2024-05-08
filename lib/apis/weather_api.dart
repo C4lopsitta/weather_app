@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:weather_app/forecast/current.dart';
 import 'package:weather_app/forecast/daily.dart';
 import '../forecast/hourly.dart';
+import '../preferences_storage.dart';
 import 'geo.dart';
 
 class WeatherApi{
@@ -46,7 +47,7 @@ class WeatherApi{
               print("api call: " + result.body);
               this._responseJson = json.decode(result.body);
               //print(this._responseJson);
-            // FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
+            FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
         }
     );
     return Current.fromJson(this._responseJson);
@@ -69,7 +70,7 @@ class WeatherApi{
           this._responseJson = json.decode(result.body);
           //print(this._responseJson);
 
-          // FileStorage.writeFile(FileStorage.HOURLY_FILE, result.body);
+          FileStorage.writeFile(FileStorage.HOURLY_FILE, result.body);
         }
     );
     return Hourly.fromJson(this._responseJson);
@@ -107,7 +108,7 @@ class WeatherApi{
           this._responseJson = json.decode(result.body);
           print(this._responseJson);
 
-          // FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
+          FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
           }
     );
     return Daily.fromJson(this._responseJson);

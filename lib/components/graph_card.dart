@@ -1,7 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/forecast/historical/graph_list_component.dart';
+
+import '../routes/graph_detailed_view.dart';
+import 'graph_utilities.dart';
 
 class GraphCard extends StatefulWidget {
   GraphCard({
@@ -10,24 +14,28 @@ class GraphCard extends StatefulWidget {
     required this.graphEnd,
     required this.graphLines,
     required this.title
-  });
+  }) {
+    double min = 0;
+    double max = 0;
+
+    graphLines.forEach((list) {
+      list.list.forEach((value) {
+        if((value ?? 0) * 1.0 > max) max = (value ?? 0) * 1.0;
+        if((value ?? 0) * 1.0 < min) min = (value ?? 0) * 1.0;
+      });
+    });
+
+    graphMax = max + 1;
+    graphMin = min - 1;
+  }
 
   DateTime graphStart;
   DateTime graphEnd;
   List<GraphListComponent> graphLines;
   String title;
 
-  double graphMin = 0;
-  double graphMax = 0;
-
-  List<Color> lineColors = [
-    const Color.fromARGB(255, 255, 10, 5),
-    Colors.blueAccent,
-    Colors.yellow,
-    Colors.deepOrange,
-    Colors.pink,
-    Colors.green
-  ];
+  late final double graphMin;
+  late final double graphMax;
 
   @override
   State<StatefulWidget> createState() => _GraphCard();
@@ -37,31 +45,22 @@ class _GraphCard extends State<GraphCard> {
   @override
   void initState() {
     super.initState();
-    widget.graphLines.forEach((list) {
-      list.list.forEach((value) {
-        if((value ?? 0) * 1.0 > widget.graphMax) widget.graphMax = (value ?? 0) * 1.0;
-        if((value ?? 0) * 1.0 < widget.graphMin) widget.graphMin = (value ?? 0) * 1.0;
-      });
-    });
-
-    widget.graphMax += 1;
-    widget.graphMin -= 1;
   }
 
   LineChartData buildData() {
-    var (range, type) = _GraphUtilities.getRangeSize(widget.graphStart, widget.graphEnd);
+    var (range, type) = GraphUtilities.getRangeSize(widget.graphStart, widget.graphEnd);
 
     return LineChartData(
       minX: 0,
       minY: widget.graphMin,
-      maxX: (widget.graphLines[0].list.length / (widget.graphLines[0].list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
+      maxX: (widget.graphLines[0].list.length / (widget.graphLines[0].list.length / GraphUtilities.getXGap(widget.graphStart, widget.graphEnd))).floorToDouble(),
       maxY: widget.graphMax,
 
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
         horizontalInterval: (widget.graphMax < 50) ? 1 : (widget.graphMax < 150) ? 25 : (widget.graphMax < 1000) ? 100 : 1000,
-        verticalInterval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
+        verticalInterval: GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: Colors.blueGrey,
@@ -84,12 +83,12 @@ class _GraphCard extends State<GraphCard> {
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
+            interval: GraphUtilities.getXGap(widget.graphStart, widget.graphEnd) * 1.0,
             reservedSize: (type < 2) ? 28 : 48,
             getTitlesWidget: (value, meta) {
               return RotatedBox(
                 quarterTurns: -3,
-                child: Text(" ${_GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value)}", style: graphLabel),
+                child: Text(" ${GraphUtilities.getHorizontalLabel(widget.graphStart, widget.graphEnd, type, value)}", style: graphLabel),
               );
             }
           )
@@ -120,17 +119,19 @@ class _GraphCard extends State<GraphCard> {
     int index = 0;
 
     widget.graphLines.forEach((line) {
-      barData.add(LineChartBarData(
-        spots: _buildLineSpots(line),
-        isCurved: false,
-        barWidth: 3,
-        isStrokeCapRound: true,
-        color: widget.lineColors[index],
-        belowBarData: BarAreaData( show: false ),
-        dotData: const FlDotData( show: true ),
-        aboveBarData: BarAreaData( show: false ),
-      ));
-      index++;
+      if(!line.ignoreInDraw) {
+        barData.add(LineChartBarData(
+          spots: _buildLineSpots(line),
+          isCurved: false,
+          barWidth: 3,
+          isStrokeCapRound: true,
+          color: line.color,
+          belowBarData: BarAreaData(show: false),
+          dotData: const FlDotData(show: true),
+          aboveBarData: BarAreaData(show: false),
+        ));
+        index++;
+      }
     });
 
     return barData;
@@ -140,7 +141,7 @@ class _GraphCard extends State<GraphCard> {
     List<FlSpot> spots = [];
     double index = 0;
 
-    double itemsPerGap = line.list.length / _GraphUtilities.getXGap(widget.graphStart, widget.graphEnd);
+    double itemsPerGap = line.list.length / GraphUtilities.getXGap(widget.graphStart, widget.graphEnd);
     double itemOffset = 1 / itemsPerGap;
 
     line.list.forEach((value) {
@@ -160,12 +161,19 @@ class _GraphCard extends State<GraphCard> {
     for(int i = 0; i < widget.graphLines.length; i++) {
       widgets.add(Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Row(
-          children: [
-            Icon(Icons.circle, color: widget.lineColors[i], size: 12),
-            const SizedBox(width: 8),
-            Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
-          ],
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              widget.graphLines[i].ignoreInDraw = !widget.graphLines[i].ignoreInDraw;
+            });
+          },
+          child: Row(
+            children: [
+              Icon((widget.graphLines[i].ignoreInDraw) ? Icons.circle_outlined : Icons.circle, color: widget.graphLines[i].color, size: 14),
+              const SizedBox(width: 8),
+              Text(widget.graphLines[i].title, style: const TextStyle(fontSize: 10))
+            ],
+          )
         )
       ));
     }
@@ -184,7 +192,40 @@ class _GraphCard extends State<GraphCard> {
           padding: const EdgeInsets.all(12),
             child: Column(
             children: [
-              Text(widget.title, style: title),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(widget.title, style: title),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+
+                        },
+                        icon: const Icon(Icons.table_chart_rounded),
+                        tooltip: "View data points"
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) =>
+                                  GraphDetailedView(
+                                    graphStart: widget.graphStart,
+                                    graphEnd: widget.graphEnd,
+                                    graphLines: widget.graphLines,
+                                    title: widget.title,
+                                  )));
+                        },
+                        icon: const Icon(Icons.open_in_full_rounded),
+                        tooltip: "Expand graph",
+                      )
+                    ]
+                  )
+                ],
+              ),
               const Divider(),
               AspectRatio(
                 aspectRatio: 1.333333333333333,
@@ -205,78 +246,4 @@ class _GraphCard extends State<GraphCard> {
   }
 }
 
-class _GraphUtilities {
-  static (int, int) getRangeSize(DateTime start, DateTime end) {
-    //TODO)) Fix this (always return total days)
-    if(start.isAfter(end)) return (0, 0);
 
-    int days = _getDaysInRange(start, end);
-    if(days < 20) return (days, 0);
-
-    int months = _getMonthsInRange(start, end);
-    if(months < 20) return (months, 1);
-
-    return (_getYearsInRange(start, end), 2);
-  }
-
-  static String getHorizontalLabel(DateTime start, DateTime end, int type, double offset) {
-    if(type == 0) { // day range
-      if(end.month == start.month) return "${start.day + offset.round()}";
-      else {
-        DateTime showedDate = start.add(Duration(days: offset.round()));
-        DateFormat formatter = DateFormat.Md();
-        if(start.year != end.year) formatter = DateFormat.yMd();
-        return formatter.format(showedDate);
-      }
-    }
-    if(type == 1) { // month range
-      DateTime showedDate = start.add(Duration(days: (29.8 * offset).round()));
-      DateFormat formatter = DateFormat.Md();
-      if(start.year != end.year) formatter = DateFormat.yMd();
-      return formatter.format(showedDate);
-    }
-    if(type == 2) {
-      DateFormat formatter = DateFormat.yM();
-      DateTime showedDate = start.add(Duration(days: (365 * offset).round()));
-      return formatter.format(showedDate);
-    }
-    return "";
-  }
-
-  static int getXGap(DateTime start, DateTime end) {
-    int range = getRangeSize(start, end).$1;
-
-    if(range < 24) return 1;
-    if(range < 180) return 10;
-    return 100;
-  }
-
-  static int _getDaysInRange(DateTime start, DateTime end) {
-    Duration duration = end.difference(start);
-    return duration.inDays;
-  }
-
-  static int _getMonthsInRange(DateTime start, DateTime end) {
-    int startYear = start.year;
-    int endYear = end.year;
-    int startMonth = start.month;
-    int endMonth = end.month;
-
-    int totalMonths = 0;
-
-    for(int year = startYear; year <= endYear; year++) {
-      for(int i = (year == startYear) ? startMonth : 1; i <= ((year == endYear) ? endMonth : 12); i++) {
-        totalMonths++;
-      }
-    }
-
-    return totalMonths;
-  }
-
-  static int _getYearsInRange(DateTime start, DateTime end) {
-    int startYear = start.year;
-    int endYear = end.year;
-
-    return endYear - startYear;
-  }
-}
