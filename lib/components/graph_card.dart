@@ -196,24 +196,34 @@ class _GraphCard extends State<GraphCard> {
                 alignment: Alignment.center,
                 children: [
                   Text(widget.title, style: title),
-                  Container(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: IconButton(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+
+                        },
+                        icon: const Icon(Icons.table_chart_rounded),
+                        tooltip: "View data points"
+                      ),
+                      IconButton(
                         onPressed: () {
                           Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>
-                                GraphDetailedView(
-                                  graphStart: widget.graphStart,
-                                  graphEnd: widget.graphEnd,
-                                  graphLines: widget.graphLines,
-                                  title: widget.title,
-                                )));
+                              context,
+                              MaterialPageRoute(builder: (context) =>
+                                  GraphDetailedView(
+                                    graphStart: widget.graphStart,
+                                    graphEnd: widget.graphEnd,
+                                    graphLines: widget.graphLines,
+                                    title: widget.title,
+                                  )));
                         },
-                        icon: const Icon(Icons.open_in_full_rounded)
-                    )
+                        icon: const Icon(Icons.open_in_full_rounded),
+                        tooltip: "Expand graph",
+                      )
+                    ]
                   )
-
                 ],
               ),
               const Divider(),
