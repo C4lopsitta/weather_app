@@ -61,7 +61,14 @@ class _WeatherHeader extends State<WeatherHeader> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.city ?? "Wadafak", style: city),
+              (widget.city == null) ?
+                 SizedBox(
+                   height: 26,
+                   width: MediaQuery.sizeOf(context).width * 0.4,
+                   child: const Center(
+                     child: LinearProgressIndicator(),
+                   ),
+                 ) : Text(widget.city!, style: city),
               Text("Last updated at ${formatter.format(widget.lastUpdate ?? DateTime.parse("1970-01-01"))}", style: updatedStyle),
               Text("${widget.temperature.round()}°C", style: temperature),
               Baseline(
