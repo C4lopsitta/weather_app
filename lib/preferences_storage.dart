@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'apis/geo.dart';
+
 class FileStorage {
   static Directory? directory;
 
@@ -97,6 +99,19 @@ class PreferencesStorage {
   static const String GEO_CITY = "geocity";
   static const String GEO_FULLNAME = "geofullname";
   static const String GEO_LAST_LOAD = "geolastload";
+
+  static Future<void> storeGeo(Geo geo, DateTime time) async {
+    await PreferencesStorage.initialize();
+
+    if(await PreferencesStorage.readBoolean(SettingPreferences.DONT_OVERWRITE_LOCATION) == true &&
+        await PreferencesStorage.readInteger(PreferencesStorage.GEO_LAST_LOAD) != null) return;
+
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_CITY, geo.city ?? "");
+    await PreferencesStorage.writeString(PreferencesStorage.GEO_FULLNAME, geo.fullName ?? "");
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LAT, geo.lat);
+    await PreferencesStorage.writeDouble(PreferencesStorage.GEO_LON, geo.lon);
+    await PreferencesStorage.writeInteger(PreferencesStorage.GEO_LAST_LOAD, time.millisecondsSinceEpoch);
+  }
 }
 
 class SettingPreferences {
