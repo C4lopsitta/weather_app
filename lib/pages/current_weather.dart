@@ -12,7 +12,6 @@ import 'package:weather_app/components/weather_hourly_card.dart';
 import 'package:weather_app/components/wind_card.dart';
 import 'package:weather_app/preferences_storage.dart';
 
-import '../apis/network_manager.dart';
 import '../forecast/current.dart';
 import '../forecast/daily.dart';
 import '../forecast/hourly.dart';
@@ -248,6 +247,8 @@ class _CurrentWeather extends State<CurrentWeather> {
 
   final TextEditingController _searchTextController = TextEditingController();
 
+  Function(Function())? suggestionsStateSetter;
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -270,37 +271,74 @@ class _CurrentWeather extends State<CurrentWeather> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SearchBar(
-                  controller: _searchTextController,
-                  onSubmitted: (text) {
-                    getSuggestions(text).then((value) => openSheet());
+                SearchAnchor(
+                  suggestionsBuilder: (BuildContext context, SearchController controller) => [],
+
+
+                  viewBuilder: (_) {
+                    return StatefulBuilder(
+                      builder: (BuildContext context, Function(Function()) updateState) {
+                        suggestionsStateSetter = updateState;
+                        return ListView(
+                          children: suggestions,
+                        );
+                      }
+                    );
                   },
-                  trailing: [ IconButton(
-                    icon: (!isGettingSuggestions) ?
-                      const Icon(Icons.search_rounded) :
-                      const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator()
+
+                  viewOnSubmitted: (String text) async {
+                    await getSuggestions(text);
+                    print("Suggestions gotten");
+                    suggestionsStateSetter!((){});
+                  },
+
+                  viewHintText: "Search for a City...",
+
+                  builder: (BuildContext context, SearchController controller) {
+                    return SearchBar(
+                      controller: _searchTextController,
+                      onSubmitted: (text) {
+                        getSuggestions(text).then((value) {
+                          controller.openView();
+                        });
+                      },
+                      onTap: () => controller.openView(),
+                      trailing: [ IconButton(
+                        icon: (!isGettingSuggestions) ?
+                        const Icon(Icons.search_rounded) :
+                        const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator()
+                        ),
+                        onPressed: () {
+                          String text = _searchTextController.text;
+                          controller.openView();
+                        },
+                      ),  ],
+                      leading: (isGettingLocation) ?
+                      const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator()
+                          )
+                      ) : IconButton(
+                        icon: const Icon(Icons.location_on_rounded),
+                        onPressed: () => geocodeCurrentLocation(),
                       ),
-                    onPressed: () {
-                      String text = _searchTextController.text;
-                      getSuggestions(text).then((value) => openSheet());
-                    },
-                  ),  ],
-                  leading: (isGettingLocation) ?
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator()
-                      )
-                    ) : IconButton(
-                      icon: const Icon(Icons.location_on_rounded),
-                      onPressed: () => geocodeCurrentLocation(),
-                    ),
+                    );
+                  },
+                  isFullScreen: false,
                 ),
+
+
+
+
+
+
+
                 if(selectedGeo != null)
                   if(isWeatherReady && ( errorEncountered == null || (errorEncountered?.isEmpty ?? true) ))
                     SizedBox(
