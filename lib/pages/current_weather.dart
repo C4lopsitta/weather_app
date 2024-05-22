@@ -47,6 +47,12 @@ class _CurrentWeather extends State<CurrentWeather> {
   void initState() {
     super.initState();
     loadFromStorage();
+
+    GithubApi.checkForUpdates().then((snackbar) {
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackbar as SnackBar);
+      }
+    });
   }
 
   Future loadFromStorage() async {
@@ -75,11 +81,6 @@ class _CurrentWeather extends State<CurrentWeather> {
         if(context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
         }
-      }
-
-      SnackBar? snackBar = await GithubApi.checkForUpdates();
-      if(context.mounted && snackBar != null) {
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/apis/geo.dart';
+import 'package:weather_app/apis/github.dart';
 import 'package:weather_app/components/switch_row_preference.dart';
 import 'package:weather_app/enum/speed_unit.dart';
 import 'package:weather_app/enum/temperature_unit.dart';

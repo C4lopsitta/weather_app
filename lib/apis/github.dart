@@ -12,25 +12,27 @@ class GithubApi {
   }
 
   static Future<String> getLatestRelease() async {
-    Uri uri = Uri.https("api.github.com", "/repos/C4lopsitta/weather_app/releases", {});
+    Uri uri = Uri.https("api.github.com", "/repos/C4lopsitta/weather_app/releases");
+    String version = "";
 
     await http.get(uri).then((result) {
       List<dynamic> releases = jsonDecode(result.body);
 
-      String release = releases[0]["tag_name"];
-
-      return release;
+      version = releases[0]["tag_name"];
     });
-    return "";
+
+    return version;
   }
 
   static Future<SnackBar?> checkForUpdates() async {
     String currentVersion = await getVersionCode();
     String latestVersion = await getLatestRelease();
 
+    print("VERSION_INFO $currentVersion CURRENT; Github reports $latestVersion");
+
     if(currentVersion == latestVersion) return null;
     return SnackBar(
-      content: Text("A new version is available! ($currentVersion -> $latestVersion)"),
+      content: Text("A new version is available!\n($currentVersion -> $latestVersion)"),
       margin: const EdgeInsets.all(12),
       behavior: SnackBarBehavior.floating,
       action: SnackBarAction(
