@@ -3,6 +3,7 @@ import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/network_manager.dart';
 import 'package:weather_app/apis/weather_api.dart';
+
 import 'package:weather_app/components/weather_current/daily_weather_card.dart';
 import 'package:weather_app/components/weather_current/full_address_card.dart';
 import 'package:weather_app/components/weather_current/sunset_sunrise_card.dart';
@@ -26,7 +27,6 @@ class CurrentWeather extends StatefulWidget {
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
   Geo? selectedGeo;
-  BuildContext? sheetContext;
   bool isGettingLocation = false;
   bool isGettingSuggestions = false;
   bool isWeatherReady = false;
@@ -52,6 +52,7 @@ class _CurrentWeather extends State<CurrentWeather> {
 
     if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
       geocodeCurrentLocation();
+
       bool isOnline = await NetworkManager.isOnline();
       if(isOnline) {
         getWeatherForSelectedGeo();
@@ -114,43 +115,6 @@ class _CurrentWeather extends State<CurrentWeather> {
       //TODO)) Add loader from file
 
     }
-  }
-
-  Future getSuggestions(String searchKey) async {
-    setState(() {
-      isGettingSuggestions = true;
-      errorEncountered = null;
-    });
-    suggestionsStateSetter!((){});
-    List<ListTile> liveSuggestions = [];
-
-    await Geo.geocodeLocation(searchKey).then((geos) {
-      geos?.forEach((geo) {
-        liveSuggestions.add(ListTile(
-          title: Text(geo.city ?? "UNDEFINED"),
-          subtitle: Text(geo.fullName ?? ""),
-          onTap: () {
-            Geo self = geo;
-            setState(() {
-              selectedGeo = self;
-              if(geo.city != null) _searchTextController.text = geo.city!;
-              isWeatherReady = false;
-              errorEncountered = null;
-              searchController.closeView(null);
-            });
-            suggestionsStateSetter!((){});
-            if(sheetContext != null) Navigator.pop(sheetContext!);
-            getWeatherForSelectedGeo();
-          },
-        ));
-      });
-
-      setState(() {
-        isGettingSuggestions = false;
-        suggestions = liveSuggestions;
-      });
-      suggestionsStateSetter!((){});
-    });
   }
 
   Future geocodeCurrentLocation() async {
@@ -233,66 +197,25 @@ class _CurrentWeather extends State<CurrentWeather> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                SearchAnchor(
-                  suggestionsBuilder: (BuildContext context, SearchController controller) => [],
+
+                SuggestingSearchBar(
                   searchController: searchController,
-
-                  viewBuilder: (_) {
-                    return StatefulBuilder(
-                      builder: (BuildContext context, Function(Function()) updateState) {
-                        suggestionsStateSetter = updateState;
-                        Widget widget =
-                          (isGettingSuggestions) ? const Center(child: CircularProgressIndicator()) :
-                          ListView(
-                            children: suggestions,
-                          );
-                        return widget;
-                      }
-                    );
+                  textController: _searchTextController,
+                  geocodeLocation: geocodeCurrentLocation,
+                  weatherApiCall: getWeatherForSelectedGeo,
+                  setGeo: (Geo geo) {
+                    selectedGeo = geo;
+                    setState(() {});
                   },
-
-                  viewOnSubmitted: (String text) async {
-                    await getSuggestions(text);
-                    suggestionsStateSetter!((){});
+                  setError: (String? error) {
+                    errorEncountered = error;
+                    setState(() {});
                   },
-
-                  viewHintText: "Search for a City...",
-
-                  builder: (BuildContext context, SearchController controller) {
-                    return SearchBar(
-                      controller: _searchTextController,
-                      onSubmitted: (text) {
-                        getSuggestions(text).then((value) {
-                          controller.openView();
-                        });
-                      },
-                      onTap: () => controller.openView(),
-                      trailing: [ IconButton(
-                        icon: const Icon(Icons.search_rounded),
-                        onPressed: () {
-                          controller.openView();
-                        },
-                      ),  ],
-                      leading: (isGettingLocation) ?
-                      const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator()
-                          )
-                      ) : IconButton(
-                        icon: const Icon(Icons.location_on_rounded),
-                        onPressed: () async {
-                          geocodeCurrentLocation();
-                          await getWeatherForSelectedGeo();
-                        },
-                      ),
-                    );
-                  },
-                  isFullScreen: false,
+                  updateWeatherReadiness: (bool state) {
+                    isWeatherReady = state;
+                    setState(() {});
+                  }
                 ),
-
 
                 if(selectedGeo != null)
                   if(isWeatherReady && ( errorEncountered == null || (errorEncountered?.isEmpty ?? true) ))
