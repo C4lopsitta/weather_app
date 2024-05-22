@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class GithubApi {
   static Future<String> getVersionCode() async {
@@ -24,11 +25,23 @@ class GithubApi {
     return version;
   }
 
+  static Future<Uri?> getLatestReleasePage() async {
+    Uri uri = Uri.https("api.github.com", "/repos/C4lopsitta/weather_app/releases");
+    String url = "";
+
+    await http.get(uri).then((result) {
+      List<dynamic> releases = jsonDecode(result.body);
+
+      url = releases[0]["html_url"];
+    });
+
+    if(url.isNotEmpty) return Uri.parse(url);
+    return null;
+  }
+
   static Future<SnackBar?> checkForUpdates() async {
     String currentVersion = await getVersionCode();
     String latestVersion = await getLatestRelease();
-
-    print("VERSION_INFO $currentVersion CURRENT; Github reports $latestVersion");
 
     if(currentVersion == latestVersion) return null;
     return SnackBar(
@@ -37,8 +50,12 @@ class GithubApi {
       behavior: SnackBarBehavior.floating,
       action: SnackBarAction(
         label: "Update",
-        onPressed: () {
-          //TODO)) Implement link opener
+        onPressed: () async {
+          Uri? uri = await getLatestReleasePage();
+          if(uri == null) return;
+          if(!await launchUrl(uri)) {
+            throw http.ClientException("Failed to open URL");
+          }
         },
       ),
     );
