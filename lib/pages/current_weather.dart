@@ -26,7 +26,6 @@ class CurrentWeather extends StatefulWidget {
 class _CurrentWeather extends State<CurrentWeather> {
   List<Widget> suggestions = [];
   Geo? selectedGeo;
-  BuildContext? sheetContext;
   bool isGettingLocation = false;
   bool isGettingSuggestions = false;
   bool isWeatherReady = false;
@@ -119,7 +118,6 @@ class _CurrentWeather extends State<CurrentWeather> {
               searchController.closeView(null);
             });
             suggestionsStateSetter!((){});
-            if(sheetContext != null) Navigator.pop(sheetContext!);
             getWeatherForSelectedGeo();
           },
         ));
