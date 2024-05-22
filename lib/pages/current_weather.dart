@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
+import 'package:weather_app/apis/github.dart';
 import 'package:weather_app/apis/network_manager.dart';
 import 'package:weather_app/apis/weather_api.dart';
 
@@ -13,6 +14,7 @@ import 'package:weather_app/components/weather_current/weather_hourly_card.dart'
 import 'package:weather_app/components/weather_current/wind_card.dart';
 import 'package:weather_app/preferences_storage.dart';
 
+import '../components/searchbar.dart';
 import '../forecast/current.dart';
 import '../forecast/daily.dart';
 import '../forecast/hourly.dart';
@@ -45,6 +47,11 @@ class _CurrentWeather extends State<CurrentWeather> {
   void initState() {
     super.initState();
     loadFromStorage();
+
+    SnackBar? snackBar = GithubApi.checkForUpdates();
+    if(context.mounted && snackBar != null) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Future loadFromStorage() async {
@@ -197,7 +204,6 @@ class _CurrentWeather extends State<CurrentWeather> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 SuggestingSearchBar(
                   searchController: searchController,
                   textController: _searchTextController,
