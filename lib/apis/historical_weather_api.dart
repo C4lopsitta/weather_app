@@ -35,12 +35,10 @@ class HistoricalWeatherApi{
     };
 
     Uri uri = Uri.https(_api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
         }
     );
@@ -60,7 +58,6 @@ class HistoricalWeatherApi{
           "apparent_temperature_min,apparent_temperature_mean"
     };
     Uri uri = Uri.https(_api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200){
@@ -69,7 +66,6 @@ class HistoricalWeatherApi{
           this._responseJson = json.decode(result.body);
         }
     );
-    print(_responseJson);
     return HistoricalTemperature.fromJson(_responseJson);
   }
   Future<HistoricalSun> call_api_sun() async {
@@ -84,12 +80,10 @@ class HistoricalWeatherApi{
       "daily": "sunrise,sunset,daylight_duration,sunshine_duration"
     };
     Uri uri = Uri.https(_api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
         }
     );
@@ -108,12 +102,10 @@ class HistoricalWeatherApi{
       "daily": "precipitation_sum,rain_sum,snowfall_sum,precipitation_hours"
     };
     Uri uri = Uri.https(_api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
         }
     );
@@ -132,12 +124,10 @@ class HistoricalWeatherApi{
       "daily": "precipitation_sum,rain_sum,snowfall_sum,precipitation_hours"
     };
     Uri uri = Uri.https(_api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
         }
     );

@@ -39,12 +39,10 @@ class WeatherApi{
         ",precipitation,wind_speed_10m,wind_direction_10m,"
     };
     Uri uri = Uri.https(api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
               if(result.statusCode != 200)
                 return null;
-              print("api call: " + result.body);
               this._responseJson = json.decode(result.body);
               //print(this._responseJson);
             FileStorage.writeFile(FileStorage.CURRENT_FILE, result.body);
@@ -61,12 +59,10 @@ class WeatherApi{
       "hourly":"temperature_2m,relative_humidity_2m,weather_code,precipitation_probability",
     };
     Uri uri = Uri.https(api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
           //print(this._responseJson);
 
@@ -99,14 +95,11 @@ class WeatherApi{
           ",sunset,uv_index_max,precipitation_probability_max"
     };
     Uri uri = Uri.https(api_url,path, params);
-    print(uri.query);
     await http.get(uri).then(
             (result){
           if(result.statusCode != 200)
             return null;
-          print("api call: " + result.body);
           this._responseJson = json.decode(result.body);
-          print(this._responseJson);
 
           FileStorage.writeFile(FileStorage.DAILY_FILE, result.body);
           }
