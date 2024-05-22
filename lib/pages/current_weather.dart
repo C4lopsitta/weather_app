@@ -3,7 +3,7 @@ import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
 import 'package:weather_app/apis/network_manager.dart';
 import 'package:weather_app/apis/weather_api.dart';
-import 'package:weather_app/components/searchbar.dart';
+
 import 'package:weather_app/components/weather_current/daily_weather_card.dart';
 import 'package:weather_app/components/weather_current/full_address_card.dart';
 import 'package:weather_app/components/weather_current/sunset_sunrise_card.dart';
@@ -52,7 +52,28 @@ class _CurrentWeather extends State<CurrentWeather> {
 
     if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
       geocodeCurrentLocation();
-      return getWeatherForSelectedGeo();
+
+      bool isOnline = await NetworkManager.isOnline();
+      if(isOnline) {
+        getWeatherForSelectedGeo();
+      } else {
+        SnackBar snackbar = SnackBar(
+            content: const Text("No connection"),
+            margin: const EdgeInsets.all(12),
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: "Retry",
+              onPressed: () {
+                if(selectedGeo != null) {
+                  getWeatherForSelectedGeo();
+                }
+              },
+            )
+        );
+        if(context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+        }
+      }
     }
 
     //load last geo (if exists)
@@ -176,6 +197,7 @@ class _CurrentWeather extends State<CurrentWeather> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+
                 SuggestingSearchBar(
                   searchController: searchController,
                   textController: _searchTextController,
