@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/apis/historical_weather_api.dart';
 import 'package:weather_app/components/graph_card.dart';
+import 'package:weather_app/components/searchbar.dart';
 import 'package:weather_app/forecast/historical/graph_list_component.dart';
 import 'package:weather_app/forecast/historical/historical_precipitation.dart';
 import 'package:weather_app/forecast/historical/historical_sun.dart';
@@ -26,22 +27,22 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     // loadFromStorage();
   }
 
+  bool _isGettingLocaiton = false;
 
   //region attributes
-  final TextEditingController _searchTextController = TextEditingController();
+  final TextEditingController searchTextController = TextEditingController();
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
+  final SearchController searchController = SearchController();
 
   List<Widget> suggestions = [];
   BuildContext? sheetContext;
-  bool _isGettingLocation = false;
-  bool _isGettingSuggestions = false;
   DateTime lastWeatherUpdate = DateTime.fromMillisecondsSinceEpoch(0);
 
   DateTime _start = DateTime.now().subtract(const Duration(days: 5));
   DateTime _end = DateTime.now().subtract(const Duration(days: 2));
 
-  Geo? _selectedGeo;
+  Geo? selectedGeo;
 
   DateFormat formatter = DateFormat.yMd();
 
@@ -91,86 +92,9 @@ class _HistoricalWeather extends State<HistoricalWeather> {
     // _getWeatherForSelectedGeo();
   }
 
-  void _openSheet() {
-    if(_searchTextController.text.isNotEmpty) {
-      showModalBottomSheet(
-          context: context,
-          showDragHandle: true,
-          enableDrag: true,
-          builder: (context) {
-            sheetContext = context;
-            return SizedBox(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text("Suggestions"),
-                                IconButton(
-                                    onPressed: () {
-                                      sheetContext = null;
-                                      Navigator.pop(context);
-                                    },
-                                    icon: const Icon(Icons.close_rounded)
-                                )
-                              ],
-                            )
-                        ),
-                        Expanded( child: SingleChildScrollView(
-                            clipBehavior: Clip.hardEdge,
-                            scrollDirection: Axis.vertical,
-                            child: Expanded(
-                                child: Column(
-                                  children: suggestions,
-                                )))),
-                      ]
-                  ),
-                )
-            );
-          }
-      );
-    }
-  }
-
-  Future _getSuggestions(String searchKey) async {
-    setState(() { _isGettingSuggestions = true; });
-    List<ListTile> liveSuggestions = [];
-
-    await Geo.geocodeLocation(searchKey).then((geos) {
-      geos?.forEach((geo) {
-        print(geo.toString());
-        liveSuggestions.add(ListTile(
-          title: Text(geo.city ?? "UNDEFINED"),
-          subtitle: Text(geo.fullName ?? ""),
-          onTap: () {
-            Geo self = geo;
-            setState(() {
-              _selectedGeo = self;
-              if(geo.city != null) _searchTextController.text = geo.city!;
-              isWeatherReady = false;
-            });
-            if(sheetContext != null) Navigator.pop(sheetContext!);
-            _getWeatherForSelectedGeo();
-          },
-        ));
-      });
-
-      setState(() {
-        _isGettingSuggestions = false;
-        suggestions = liveSuggestions;
-      });
-    });
-  }
-
-  Future _geocodeCurrentLocation() async {
+  Future geocodeCurrentLocation() async {
     setState(() {
-      _isGettingLocation = true;
+      _isGettingLocaiton = true;
       isWeatherReady = false;
     });
     try {
@@ -178,26 +102,26 @@ class _HistoricalWeather extends State<HistoricalWeather> {
       current = await Geo.geocodeCurrentLocation(current);
 
       setState(() {
-        if(current.city != null) _searchTextController.text = current.city!;
-        _isGettingLocation = false;
-        _selectedGeo = current;
+        if(current.city != null) searchTextController.text = current.city!;
+        _isGettingLocaiton = false;
+        selectedGeo = current;
       });
 
     } catch(exception) {
-      print(exception.toString());
+      print("AAAA");
     }
 
-    _getWeatherForSelectedGeo();
+    getWeatherForSelectedGeo();
   }
 
-  Future _getWeatherForSelectedGeo() async {
-    if(_selectedGeo == null) return;
+  Future getWeatherForSelectedGeo() async {
+    if(selectedGeo == null) return;
 
     setState(() {
       _apiError = false;
     });
 
-    HistoricalWeatherApi weather = HistoricalWeatherApi(geo: _selectedGeo, startDate: _start, endDate: _end);
+    HistoricalWeatherApi weather = HistoricalWeatherApi(geo: selectedGeo, startDate: _start, endDate: _end);
 
     try {
       ApiResults[0] = await weather.call_api_temperature();
@@ -349,9 +273,9 @@ class _HistoricalWeather extends State<HistoricalWeather> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
-        if(_selectedGeo != null && isWeatherReady == true) {
+        if(selectedGeo != null && isWeatherReady == true) {
           setState(() { isWeatherReady = false; });
-          _getWeatherForSelectedGeo();
+          getWeatherForSelectedGeo();
         }
       },
       child: Column(
@@ -375,36 +299,20 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                       alignment: Alignment.center,
                       child: Column(
                         children: [
-                          SearchBar(
-                            controller: _searchTextController,
-                            onSubmitted: (text) {
-                              _getSuggestions(text).then((value) => _openSheet());
+                          SuggestingSearchBar(
+                            searchController: searchController,
+                            textController: searchTextController,
+                            geocodeLocation: geocodeCurrentLocation,
+                            weatherApiCall: getWeatherForSelectedGeo,
+                            setGeo: (Geo geo) {
+                              selectedGeo = geo;
+                              setState(() {});
                             },
-                            trailing: [ IconButton(
-                              icon: (!_isGettingSuggestions) ?
-                              const Icon(Icons.search_rounded) :
-                              const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator()
-                              ),
-                              onPressed: () {
-                                String text = _searchTextController.text;
-                                _getSuggestions(text).then((value) => _openSheet());
-                              },
-                            ) ],
-                            leading: (_isGettingLocation) ?
-                            const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 12),
-                                child: SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator()
-                                )
-                            ) : IconButton(
-                              icon: const Icon(Icons.location_on_rounded),
-                              onPressed: () => _geocodeCurrentLocation(),
-                            ),
+                            setError: (String? error) {},
+                            updateWeatherReadiness: (bool state) {
+                              isWeatherReady = state;
+                              setState(() {});
+                            }
                           ),
                           Expanded(
                             child: Column(
@@ -453,7 +361,7 @@ class _HistoricalWeather extends State<HistoricalWeather> {
                     ),
                   ),
                 ),
-                if(_selectedGeo != null)
+                if(selectedGeo != null)
                   if(isWeatherReady)
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
