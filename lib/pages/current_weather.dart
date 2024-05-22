@@ -52,7 +52,27 @@ class _CurrentWeather extends State<CurrentWeather> {
 
     if(await PreferencesStorage.readBoolean(SettingPreferences.USE_GPS_DEFAULT) == true) {
       geocodeCurrentLocation();
-      return getWeatherForSelectedGeo();
+      bool isOnline = await NetworkManager.isOnline();
+      if(isOnline) {
+        getWeatherForSelectedGeo();
+      } else {
+        SnackBar snackbar = SnackBar(
+            content: const Text("No connection"),
+            margin: const EdgeInsets.all(12),
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: "Retry",
+              onPressed: () {
+                if(selectedGeo != null) {
+                  getWeatherForSelectedGeo();
+                }
+              },
+            )
+        );
+        if(context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+        }
+      }
     }
 
     //load last geo (if exists)
