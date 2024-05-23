@@ -32,7 +32,13 @@ class GithubApi {
     await http.get(uri).then((result) {
       List<dynamic> releases = jsonDecode(result.body);
 
-      url = releases[0]["html_url"];
+      releases.forEach((release) {
+        if(release["draft"] == false && release["prerelease"] == false) {
+          url = release["tag_name"];
+        }
+      });
+
+      if(url.isEmpty) url = releases[0]["tag_name"];
     });
 
     if(url.isNotEmpty) return Uri.parse(url);
