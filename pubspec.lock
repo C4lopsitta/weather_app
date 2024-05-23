@@ -360,6 +360,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  semaphore_plus:
+    dependency: "direct main"
+    description:
+      name: semaphore_plus
+      sha256: "2e05324ace8f4db9aa7ac9a9fa77e97082da4b0caff692e90a2c6f780658878f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   shared_preferences:
     dependency: "direct main"
     description:

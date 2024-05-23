@@ -18,8 +18,13 @@ class GithubApi {
 
     await http.get(uri).then((result) {
       List<dynamic> releases = jsonDecode(result.body);
+      releases.forEach((release) {
+        if(release["draft"] == false && release["prerelease"] == false) {
+          version = release["tag_name"];
+        }
+      });
 
-      version = releases[0]["tag_name"];
+      if(version.isEmpty) version = releases[0]["tag_name"];
     });
 
     return version;
@@ -31,8 +36,13 @@ class GithubApi {
 
     await http.get(uri).then((result) {
       List<dynamic> releases = jsonDecode(result.body);
+      releases.forEach((release) {
+        if(release["draft"] == false && release["prerelease"] == false) {
+          url = release["html_url"];
+        }
+      });
 
-      url = releases[0]["html_url"];
+      if(url.isEmpty) url = releases[0]["html_url"];
     });
 
     if(url.isNotEmpty) return Uri.parse(url);
