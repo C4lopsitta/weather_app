@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:weather_app/apis/geo.dart';
@@ -12,6 +13,7 @@ import 'package:weather_app/components/weather_current/uv_index_card.dart';
 import 'package:weather_app/components/weather_current/weather_header.dart';
 import 'package:weather_app/components/weather_current/weather_hourly_card.dart';
 import 'package:weather_app/components/weather_current/wind_card.dart';
+import 'package:weather_app/forecast/weather_translator.dart';
 import 'package:weather_app/preferences_storage.dart';
 
 import '../components/searchbar.dart';
@@ -42,6 +44,11 @@ class _CurrentWeather extends State<CurrentWeather> {
   SearchController searchController = SearchController();
   final TextEditingController _searchTextController = TextEditingController();
   Function(Function())? suggestionsStateSetter;
+
+  LinearGradient? backgroundGradient = null;
+  List<double> backgroundSteps = [0, 1];
+  bool isDarkMode = true;
+  Color? backgroundColor = null;
 
   @override
   void initState() {
@@ -169,6 +176,15 @@ class _CurrentWeather extends State<CurrentWeather> {
       setState(() {
         isWeatherReady = true;
         errorEncountered = null;
+
+        backgroundGradient = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            WeatherTranslator.getWeatherColor(currentWeather!.weatherCode, isDarkMode),
+            backgroundColor!
+          ]
+        );
       });
 
     } on ClientException catch (ex) {
@@ -182,128 +198,135 @@ class _CurrentWeather extends State<CurrentWeather> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        if(selectedGeo != null && isWeatherReady == true) {
-          setState(() { isWeatherReady = false; });
-          getWeatherForSelectedGeo();
-        }
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: MediaQuery.of(context).viewPadding.top),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SuggestingSearchBar(
-                  searchController: searchController,
-                  textController: _searchTextController,
-                  geocodeLocation: geocodeCurrentLocation,
-                  weatherApiCall: getWeatherForSelectedGeo,
-                  setGeo: (Geo geo) {
-                    selectedGeo = geo;
-                    setState(() {});
-                  },
-                  setError: (String? error) {
-                    errorEncountered = error;
-                    setState(() {});
-                  },
-                  updateWeatherReadiness: (bool state) {
-                    isWeatherReady = state;
-                    setState(() {});
-                  }
-                ),
+    isDarkMode = (MediaQuery.of(context).platformBrightness == Brightness.light) ? false : true;
+    backgroundColor = ((isDarkMode) ? ThemeData.dark() : ThemeData.light()).colorScheme.background;
 
-                if(selectedGeo != null)
-                  if(isWeatherReady && ( errorEncountered == null || (errorEncountered?.isEmpty ?? true) ))
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height - 148
-                          - MediaQuery.of(context).viewPadding.top,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            WeatherHeader(
-                              city: (isGettingLocation) ? null : selectedGeo!.city,
-                              temperature: currentWeather!.temperature,
-                              status: currentWeather!.weatherCode,
-                              minTemp: dailyWeather!.minTemperature[0],
-                              maxTemp: dailyWeather!.maxTemperature[0],
-                              perceivedTemp: currentWeather!.apparentTemperature,
-                              lastUpdate: lastWeatherUpdate
-                            ),
-                            HourlyWeatherCard(hourly: hourlyWeather!),
-                            const SizedBox(height: 12),
-                            DailyWeatherCard(daily: dailyWeather!),
-                            SizedBox(
-                              height: MediaQuery.sizeOf(context).height * 0.26,
-                              child: GridView.count(
-                                primary: false,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                crossAxisCount: 2,
-                                children: [
-                                  WindCard(
-                                    windDirection: currentWeather!.windDirection,
-                                    windSpeed: currentWeather!.windSpeed
-                                  ),
-                                  SunsetSunriseCard(
-                                      sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
-                                      sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
-                                  ),
-                                ],
-                              )
-                            ),
-                            const SizedBox(height: 12),
-                            UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
-                            const SizedBox(height: 12),
-                            FullAddressCard(address: selectedGeo?.fullName ?? ""),
-                            const SizedBox(height: 24)
-                          ]
+    return Container(
+      decoration: BoxDecoration(
+        gradient: backgroundGradient
+      ),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          if(selectedGeo != null && isWeatherReady == true) {
+            setState(() { isWeatherReady = false; });
+            getWeatherForSelectedGeo();
+          }
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: MediaQuery.of(context).viewPadding.top),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SuggestingSearchBar(
+                    searchController: searchController,
+                    textController: _searchTextController,
+                    geocodeLocation: geocodeCurrentLocation,
+                    weatherApiCall: getWeatherForSelectedGeo,
+                    setGeo: (Geo geo) {
+                      selectedGeo = geo;
+                      setState(() {});
+                    },
+                    setError: (String? error) {
+                      errorEncountered = error;
+                      setState(() {});
+                    },
+                    updateWeatherReadiness: (bool state) {
+                      isWeatherReady = state;
+                      setState(() {});
+                    }
+                  ),
+
+                  if(selectedGeo != null)
+                    if(isWeatherReady && ( errorEncountered == null || (errorEncountered?.isEmpty ?? true) ))
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height - 148
+                            - MediaQuery.of(context).viewPadding.top,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              WeatherHeader(
+                                city: (isGettingLocation) ? null : selectedGeo!.city,
+                                temperature: currentWeather!.temperature,
+                                status: currentWeather!.weatherCode,
+                                minTemp: dailyWeather!.minTemperature[0],
+                                maxTemp: dailyWeather!.maxTemperature[0],
+                                perceivedTemp: currentWeather!.apparentTemperature,
+                                lastUpdate: lastWeatherUpdate
+                              ),
+                              HourlyWeatherCard(hourly: hourlyWeather!),
+                              const SizedBox(height: 12),
+                              DailyWeatherCard(daily: dailyWeather!),
+                              SizedBox(
+                                height: MediaQuery.sizeOf(context).height * 0.26,
+                                child: GridView.count(
+                                  primary: false,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  crossAxisCount: 2,
+                                  children: [
+                                    WindCard(
+                                      windDirection: currentWeather!.windDirection,
+                                      windSpeed: currentWeather!.windSpeed
+                                    ),
+                                    SunsetSunriseCard(
+                                        sunrise: dailyWeather!.sunrise?[0] ?? "1970-01-01 00:00",
+                                        sunset: dailyWeather!.sunset?[0] ?? "1970-01-01 00:00"
+                                    ),
+                                  ],
+                                )
+                              ),
+                              const SizedBox(height: 12),
+                              UvIndexCard(uvIndex: dailyWeather!.uvMaxIndex?[0] ?? 255),
+                              const SizedBox(height: 12),
+                              FullAddressCard(address: selectedGeo?.fullName ?? ""),
+                              const SizedBox(height: 24)
+                            ]
+                          )
                         )
                       )
-                    )
-                  else
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.75,
-                      child: Center(
-                        child: (errorEncountered == null) ?
-                          const CircularProgressIndicator() :
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(errorEncountered ?? ""),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  if(selectedGeo != null && isWeatherReady == true) {
-                                    setState(() { isWeatherReady = false; });
-                                    getWeatherForSelectedGeo();
-                                  }
-                                },
-                                icon: const Icon(Icons.refresh)
-                              )
-                            ],
-                          )
+                    else
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.75,
+                        child: Center(
+                          child: (errorEncountered == null) ?
+                            const CircularProgressIndicator() :
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(errorEncountered ?? ""),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    if(selectedGeo != null && isWeatherReady == true) {
+                                      setState(() { isWeatherReady = false; });
+                                      getWeatherForSelectedGeo();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.refresh)
+                                )
+                              ],
+                            )
+                        )
                       )
-                    )
-                ],
+                  ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      )
     );
   }
 }

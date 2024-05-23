@@ -22,6 +22,26 @@ class WeatherTranslator{
       return Icons.thunderstorm;
     return Icons.question_mark;
   }
+
+  static Color getWeatherColor(int weatherStatus, bool isDarkMode) {
+    if(weatherStatus == 0 || weatherStatus == 1) {
+      return const Color.fromRGBO(102, 204, 255, 1.0);
+    }
+    if(weatherStatus == 2 || weatherStatus == 3) {
+      return const Color.fromRGBO(78, 87, 89, 1.0);
+    }
+    if(weatherStatus == 45 || weatherStatus == 48) {
+      return const Color.fromRGBO(63, 63, 63, 1);
+    }
+    if(weatherStatus <= 51 || weatherStatus <= 86) {
+      return const Color.fromRGBO(119, 119, 119, 1);
+    }
+    if(weatherStatus == 95 || weatherStatus == 96 || weatherStatus == 99) {
+      return const Color.fromRGBO(53, 59, 61, 1);
+    }
+    return ((isDarkMode) ? ThemeData.dark() : ThemeData.light()).colorScheme.background;
+  }
+
   static String getWeatherDescription(int weatherStatus){  //weatherStatus is a standard WMO number
     if(weatherStatus == 0)
       return "Clear sky";
