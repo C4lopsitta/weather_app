@@ -2,7 +2,7 @@ name: weather_app
 description: "Weather application using open-meteo.com API"
 publish_to: 'none'
 
-version: 0.9.3-developer
+version: 0.9.5
 
 environment:
   sdk: '>=3.2.6 <4.0.0'

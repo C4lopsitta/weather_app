@@ -21,8 +21,12 @@ class _Settings extends State<Settings> {
   TemperatureUnit selectedTemperatureUnit = TemperatureUnit.CELSIUS;
   SpeedUnit selectedWindSpeedUnit = SpeedUnit.KMH;
 
+  String version = "";
+
   @override
   Widget build(BuildContext context) {
+    GithubApi.getVersionCode().then((value) => setState(() => version = value ));
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,8 +34,12 @@ class _Settings extends State<Settings> {
         SizedBox(height: MediaQuery.of(context).viewPadding.top),
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-          child: SingleChildScrollView(
-            child: Column(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height - 92
+                - MediaQuery.of(context).viewPadding.top,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text("Location settings", style: titleStyle),
                   const SwitchRowPreference(preference: SettingPreferences.USE_GPS_DEFAULT, text: "Always load GPS location"),
@@ -102,16 +110,21 @@ class _Settings extends State<Settings> {
                   const SizedBox(height: 20),
                   const Divider(),
                   Text("Current weather settings", style: titleStyle),
+                  const SwitchRowPreference(preference: SettingPreferences.SHOW_COLOR_BACKGROUND, text: "Show a colored background depending on weather", defaultState: true),
 
                   const SizedBox(height: 20),
                   const Divider(),
                   Text("Historical weather settings", style: titleStyle),
 
+                  const Divider(),
+                  Text("Applicaiton Info", style: titleStyle),
+                  Text("Weather App, Licensed under GPLv3 License.\nVersion $version"),
+                  const SizedBox(height: 92)
                 ]
-            ),
+              ),
+            )
           )
         )
-
       ],
     );
   }

@@ -7,7 +7,7 @@ class SwitchRowPreference extends StatefulWidget {
     required this.preference,
     required this.text,
     this.subtext,
-    this.defaultState = false
+    this.defaultState = false,
   });
 
   final String preference;
@@ -52,7 +52,9 @@ class _SwitchRowPreference extends State<SwitchRowPreference> {
           }
         ),
         const SizedBox(width: 14),
-        Text(widget.text)
+        Expanded(
+          child: Text(widget.text)
+        )
       ],
     );
   }

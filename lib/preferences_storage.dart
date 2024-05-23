@@ -117,4 +117,5 @@ class PreferencesStorage {
 class SettingPreferences {
   static const String USE_GPS_DEFAULT = "gpsdefault";
   static const String DONT_OVERWRITE_LOCATION = "keeplocation";
+  static const String SHOW_COLOR_BACKGROUND = "colorbackground";
 }
