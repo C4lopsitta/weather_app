@@ -47,22 +47,7 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
 
     await Geo.geocodeLocation(searchKey).then((geos) {
       geos?.forEach((geo) {
-        liveSuggestions.add(ListTile(
-          title: Text(geo.city ?? "UNDEFINED"),
-          subtitle: Text(geo.fullName ?? ""),
-          onTap: () {
-            Geo self = geo;
-            setState(() {
-              widget.setGeo(self);
-              if(geo.city != null) widget.textController.text = geo.city!;
-              widget.updateWeatherReadiness(false);
-              widget.setError(null);
-              widget.searchController.closeView(null);
-            });
-            suggestionStateSetter!((){});
-            widget.weatherApiCall();
-          },
-        ));
+        liveSuggestions.add(geo.toListItem((Geo self) => weatherTileOnTap(self)));
       });
 
       setState(() {
@@ -73,6 +58,18 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
     });
   }
 
+  void weatherTileOnTap(Geo self) {
+    setState(() {
+      widget.setGeo(self);
+      if(self.city != null) widget.textController.text = self.city!;
+      widget.updateWeatherReadiness(false);
+      widget.setError(null);
+      suggestions = [];
+      widget.searchController.closeView(null);
+    });
+    suggestionStateSetter!((){});
+    widget.weatherApiCall();
+  }
 
 
 
@@ -88,9 +85,8 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
               suggestionStateSetter = updateState;
               Widget widget =
               (isGettingSuggestions) ? const Center(child: CircularProgressIndicator()) :
-              ListView(
-                children: suggestions,
-              );
+              (suggestions.isNotEmpty) ? ListView( children: suggestions ) :
+              ListView(children : Geo.buildFavouritesList((Geo self) => weatherTileOnTap(self)));
               return widget;
             }
         );
