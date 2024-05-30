@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_app/enum/view_status.dart';
 
 import '../apis/geo.dart';
 
@@ -33,46 +34,45 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
   }
 
   Function(Function())? suggestionStateSetter;
-  List<ListTile> suggestions = [];
+  List<StatefulBuilder> suggestions = [];
+  ViewStatus viewStatus = ViewStatus.NO_ACTION;
+
   bool isGettingLocation = false;
-  bool isGettingSuggestions = false;
 
   Future getSuggestions(String searchKey) async {
     setState(() {
-      isGettingSuggestions = true;
+      viewStatus = ViewStatus.LOADING_SUGGESITONS;
       widget.setError(null);
     });
     suggestionStateSetter!((){});
-    List<ListTile> liveSuggestions = [];
+    List<StatefulBuilder> liveSuggestions = [];
 
     await Geo.geocodeLocation(searchKey).then((geos) {
       geos?.forEach((geo) {
-        liveSuggestions.add(ListTile(
-          title: Text(geo.city ?? "UNDEFINED"),
-          subtitle: Text(geo.fullName ?? ""),
-          onTap: () {
-            Geo self = geo;
-            setState(() {
-              widget.setGeo(self);
-              if(geo.city != null) widget.textController.text = geo.city!;
-              widget.updateWeatherReadiness(false);
-              widget.setError(null);
-              widget.searchController.closeView(null);
-            });
-            suggestionStateSetter!((){});
-            widget.weatherApiCall();
-          },
-        ));
+        liveSuggestions.add(geo.toListItem((Geo self) => weatherTileOnTap(self)));
       });
 
       setState(() {
-        isGettingSuggestions = false;
+        viewStatus = ViewStatus.VIEWING_SUGGESTIONS;
         suggestions = liveSuggestions;
       });
       suggestionStateSetter!((){});
     });
   }
 
+  void weatherTileOnTap(Geo self) {
+    setState(() {
+      widget.setGeo(self);
+      if(self.city != null) widget.textController.text = self.city!;
+      widget.updateWeatherReadiness(false);
+      widget.setError(null);
+      suggestions = [];
+      widget.searchController.closeView(null);
+    });
+    suggestionStateSetter!((){});
+    widget.weatherApiCall();
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
 
 
 
@@ -86,12 +86,13 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
         return StatefulBuilder(
             builder: (BuildContext context, Function(Function()) updateState) {
               suggestionStateSetter = updateState;
-              Widget widget =
-              (isGettingSuggestions) ? const Center(child: CircularProgressIndicator()) :
-              ListView(
-                children: suggestions,
-              );
-              return widget;
+              if(viewStatus == ViewStatus.LOADING_SUGGESITONS) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (viewStatus == ViewStatus.VIEWING_FAVOURITES) {
+                return ListView(children: Geo.buildFavouritesList((Geo self) => weatherTileOnTap(self)));
+              } else {
+                return ListView(children: suggestions);
+              }
             }
         );
       },
@@ -108,6 +109,7 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
           controller: widget.textController,
           onSubmitted: (text) {
             getSuggestions(text).then((value) {
+              viewStatus = ViewStatus.NO_ACTION;
               controller.openView();
             });
           },
@@ -117,7 +119,16 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
             onPressed: () {
               controller.openView();
             },
-          ),  ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.star_rounded),
+            onPressed: () async {
+              await Geo.loadFavourites();
+              viewStatus = ViewStatus.VIEWING_FAVOURITES;
+              controller.openView();
+
+            },
+          ) ],
           leading: (isGettingLocation) ?
           const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -135,7 +146,7 @@ class _SuggestingSearchBar extends State<SuggestingSearchBar> {
           ),
         );
       },
-      isFullScreen: false,
+      isFullScreen: true,
     );
   }
 }

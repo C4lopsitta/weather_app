@@ -1,16 +1,23 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/exceptions/geo_exception.dart';
+import 'package:weather_app/preferences_storage.dart';
 
 class Geo {
   Geo(this.lat, this.lon, {this.city, this.fullName});
 
+  //region attributes
   double lat;
   double lon;
   String? city;
   String? fullName;
+  //endregion
+
+  static const String favouriteFileLocation = "favourites.json";
+  static List<Geo> favouriteLocations = [];
 
   bool isEqual(Geo geo) =>
       (geo.city == city &&
@@ -23,7 +30,30 @@ class Geo {
     return "GEO: {lat: $lat, lon: $lon, city: $city, fullName: $fullName}";
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      "city": this.city,
+      "fullName": this.fullName,
+      "coordinates": {
+        "latitude": this.lat,
+        "longitude": this.lon
+      }
+    };
+  }
 
+  static Geo fromJson(Map<String, dynamic> json) {
+    double lat = json["coordinates"]["latitude"];
+    double lon = json["coordinates"]["longitude"];
+
+    return Geo(
+      lat,
+      lon,
+      city: json["city"] ?? "",
+      fullName: json["fullName"] ?? "",
+    );
+  }
+
+  //region apis
   static const String _nominatimURL = "nominatim.openstreetmap.org";
   static const String _nominatimSearch = "/search";
   static const String _nominatimReverse = "/reverse";
@@ -56,7 +86,6 @@ class Geo {
 
     return Geo(data.latitude!, data.longitude!);
   }
-
 
   static Future<List<Geo>?> geocodeLocation(String location) async {
     Map<String, String> params = {
@@ -109,5 +138,104 @@ class Geo {
     });
 
     return current;
+  }
+  //endregion
+
+  static Future<void> loadFavourites() async {
+    FileStorage.initialize();
+    String? jsonString = await FileStorage.readFile(favouriteFileLocation);
+
+    if(jsonString == null) return;
+
+    List<dynamic> geos = jsonDecode(jsonString);
+
+    favouriteLocations = [];
+    geos.forEach((geo) {
+      Geo geoObject = Geo.fromJson(geo as Map<String, dynamic>);
+      favouriteLocations.add(geoObject);
+    });
+  }
+
+  static void storeFavourites() async {
+    FileStorage.initialize();
+    String json = "[";
+
+    for(int i = 0; i < favouriteLocations.length; i++) {
+      json += jsonEncode(favouriteLocations[i].toJson());
+      if(i != (favouriteLocations.length - 1)) json += ',';
+    }
+
+    json += ']';
+
+    FileStorage.writeFile(favouriteFileLocation, json);
+  }
+
+  static void addFavourite(Geo geo) {
+    bool unique = true;
+    favouriteLocations.forEach((city) {
+      if(city.isEqual(geo)) unique = false;
+    });
+
+    if(unique == false) return;
+    favouriteLocations.add(geo);
+  }
+
+  static void popFavourite(Geo geo) {
+    for(int i = 0; i < favouriteLocations.length; i++) {
+      if(favouriteLocations[i].isEqual(geo)) {
+        favouriteLocations.removeAt(i);
+        return;
+      }
+    }
+  }
+
+  static bool isFavourite(Geo geo) {
+    bool status = false;
+    favouriteLocations.forEach((city) {
+      if(city.isEqual(geo)) status = true;
+    });
+    return status;
+  }
+
+  StatefulBuilder toListItem(Function(Geo) weatherSetter, {Function()? triggerFavouriteListUpdate}) {
+    return StatefulBuilder(
+      builder: (BuildContext context, Function(Function()) setter) {
+        bool isFavourite = Geo.isFavourite(this);
+        return ListTile(
+          title: Text(city ?? ""),
+          subtitle: Text(fullName ?? ""),
+          onTap: () => weatherSetter(this),
+          trailing: IconButton(
+            icon: Icon((isFavourite) ? Icons.star_rounded : Icons.star_border_rounded),
+            onPressed: () {
+              Geo self = this;
+              if(Geo.isFavourite(self)) {
+                Geo.popFavourite(self);
+                Geo.storeFavourites();
+                setter(() => isFavourite = false);
+                if(triggerFavouriteListUpdate != null)
+                  triggerFavouriteListUpdate();
+              } else {
+                Geo.addFavourite(self);
+                Geo.storeFavourites();
+                setter(() => isFavourite = true);
+                if(triggerFavouriteListUpdate != null)
+                  triggerFavouriteListUpdate();
+              }
+            },
+          )
+        );
+      }
+    );
+  }
+
+  static List<StatefulBuilder> buildFavouritesList(Function(Geo self) onTap) {
+    List<StatefulBuilder> list = [];
+
+    favouriteLocations.forEach((location) {
+      list.add(location.toListItem((Geo self) => onTap(self)));
+    });
+
+    return list;
   }
 }

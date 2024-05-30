@@ -26,6 +26,9 @@ class WeatherTranslator{
   //TODO)) Implement an hourly based daylight sky (orange on sunset)
   static Color getWeatherColor(int weatherStatus, bool isDarkMode) {
     if(weatherStatus == 0 || weatherStatus == 1) {
+      if(isDarkMode) {
+        return const Color.fromRGBO(102, 204, 255, 1.0);
+      }
       return const Color.fromRGBO(102, 204, 255, 1.0);
     }
     if(weatherStatus == 2 || weatherStatus == 3) {
@@ -44,32 +47,45 @@ class WeatherTranslator{
   }
 
   static String getWeatherDescription(int weatherStatus){  //weatherStatus is a standard WMO number
-    if(weatherStatus == 0)
+    if(weatherStatus == 0) {
       return "Clear sky";
-    if(weatherStatus == 1)
+    }
+    if(weatherStatus == 1) {
       return "Mainly clear";
-    if(weatherStatus == 2 || weatherStatus == 3)
+    }
+    if(weatherStatus == 2 || weatherStatus == 3) {
       return "partly cloudy";
-    if(weatherStatus == 45 || weatherStatus == 48)
+    }
+    if(weatherStatus == 45 || weatherStatus == 48) {
       return "Fog and depositing rime fog";
-    if(weatherStatus == 51 || weatherStatus == 53 || weatherStatus == 55)
-      return (weatherStatus == 51? "light":"moderate") + " Drizzle";
-    if(weatherStatus == 56 || weatherStatus == 57)
+    }
+    if(weatherStatus == 51 || weatherStatus == 53 || weatherStatus == 55) {
+      return "${weatherStatus == 51? "light":"moderate"} Drizzle";
+    }
+    if(weatherStatus == 56 || weatherStatus == 57) {
       return "Freezing Drizzle";
-    if(weatherStatus == 61 || weatherStatus == 63 || weatherStatus == 65)
-      return (weatherStatus == 61? "light":"Heavy") + " Rain";
-    if(weatherStatus == 66 || weatherStatus == 67)
-      return (weatherStatus == 66?"Light":"Heavy") + " Freezing Rain";
-    if(weatherStatus == 71 || weatherStatus == 73 || weatherStatus == 75)
-      return (weatherStatus == 71? "Slight":"Heavy intensity") + " snow";
-    if(weatherStatus == 77)
+    }
+    if(weatherStatus == 61 || weatherStatus == 63 || weatherStatus == 65) {
+      return "${weatherStatus == 61? "light":"Heavy"} Rain";
+    }
+    if(weatherStatus == 66 || weatherStatus == 67) {
+      return "${weatherStatus == 66?"Light":"Heavy"} Freezing Rain";
+    }
+    if(weatherStatus == 71 || weatherStatus == 73 || weatherStatus == 75) {
+      return "${weatherStatus == 71? "Slight":"Heavy intensity"} snow";
+    }
+    if(weatherStatus == 77) {
       return "Snow grains";
-    if(weatherStatus == 80 || weatherStatus == 81 || weatherStatus == 82)
-      return (weatherStatus == 80? "Slight":"Violent") + " Rain Showers";
-    if(weatherStatus == 85 || weatherStatus == 86)
-      return (weatherStatus == 80? "Slight":"Heavy") + " Snow Showers";
-    if(weatherStatus == 95 || weatherStatus == 96 || weatherStatus == 99)
+    }
+    if(weatherStatus == 80 || weatherStatus == 81 || weatherStatus == 82) {
+      return "${weatherStatus == 80? "Slight":"Violent"} Rain Showers";
+    }
+    if(weatherStatus == 85 || weatherStatus == 86) {
+      return "${weatherStatus == 80? "Slight":"Heavy"} Snow Showers";
+    }
+    if(weatherStatus == 95 || weatherStatus == 96 || weatherStatus == 99) {
       return "Thunderstorm";
+    }
     return "";
   }
 

@@ -5,6 +5,8 @@ import 'package:weather_app/pages/historical_weather.dart';
 import 'package:weather_app/pages/settings.dart';
 import 'package:weather_app/preferences_storage.dart';
 
+import 'apis/geo.dart';
+
 void main() {
   runApp(const MyApp());
 }

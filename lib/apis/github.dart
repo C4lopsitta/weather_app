@@ -13,18 +13,18 @@ class GithubApi {
     return packageInfo.version;
   }
 
-  static bool isNewer(String checked, String against) {
-    checked = checked.split('-')[0];
-    against = checked.split('-')[0];
-    List<String> checkedParts = checked.split(".");
-    List<String> againstParts = against.split(".");
+  static bool isNewer(String gitVersion, String current) {
+    gitVersion = gitVersion.split('-')[0];
+    current = gitVersion.split('-')[0];
+    List<String> gitParts = gitVersion.split(".");
+    List<String> currentParts = current.split(".");
 
-    if(int.parse(checkedParts[0]) < int.parse(againstParts[0])) return false;
+    if(int.parse(gitParts[0]) < int.parse(currentParts[0])) return false;
 
-    if(int.parse(checkedParts[0]) == int.parse(againstParts[0])) {
-      if(int.parse(checkedParts[1]) < int.parse(againstParts[1])) return false;
-      if(int.parse(checkedParts[1]) == int.parse(againstParts[1])) {
-        if(int.parse(checkedParts[2]) <= int.parse(againstParts[2])) return false;
+    if(int.parse(gitParts[0]) == int.parse(currentParts[0])) {
+      if(int.parse(gitParts[1]) < int.parse(currentParts[1])) return false;
+      if(int.parse(gitParts[1]) == int.parse(currentParts[1])) {
+        if(int.parse(gitParts[2]) <= int.parse(currentParts[2])) return false;
       }
     }
 
@@ -40,15 +40,9 @@ class GithubApi {
       releases.forEach((release) {
         if(release["draft"] == false && release["prerelease"] == false) {
           String toCheck = release["tag_name"];
-          if(version.isNotEmpty) {
-            if(isNewer(toCheck, version) == true) version = toCheck;
-          } else {
-            version = toCheck;
-          }
+          if(isNewer(toCheck, version) == true) version = toCheck;
         }
       });
-
-      if(version.isEmpty) version = releases[0]["tag_name"];
     });
 
     return version;
@@ -84,7 +78,7 @@ class GithubApi {
     String currentVersion = await getVersionCode();
     String latestVersion = await getLatestRelease();
 
-    if(currentVersion == latestVersion) return null;
+    if(currentVersion == latestVersion || latestVersion.isEmpty) return null;
     return SnackBar(
       content: Text("A new version is available!\n($currentVersion -> $latestVersion)"),
       margin: const EdgeInsets.all(12),
