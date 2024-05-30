@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:weather_app/apis/geo.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weather_app/apis/github.dart';
 import 'package:weather_app/components/switch_row_preference.dart';
 import 'package:weather_app/enum/speed_unit.dart';
 import 'package:weather_app/enum/temperature_unit.dart';
 import 'package:weather_app/preferences_storage.dart';
+import 'package:http/http.dart' as http;
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -15,6 +15,15 @@ class Settings extends StatefulWidget {
 }
 
 class _Settings extends State<Settings> {
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      GithubApi.getLatestRelease().then((value) => newerVersion = value);
+    });
+  }
+
   TextStyle titleStyle = const TextStyle(fontSize: 16, height: 2);
   TextStyle subTitleStyle = const TextStyle(fontSize: 14, height: 3);
 
@@ -22,6 +31,7 @@ class _Settings extends State<Settings> {
   SpeedUnit selectedWindSpeedUnit = SpeedUnit.KMH;
 
   String version = "";
+  String newerVersion = "";
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +129,13 @@ class _Settings extends State<Settings> {
                   const Divider(),
                   Text("Applicaiton Info", style: titleStyle),
                   Text("Weather App, Licensed under GPLv3 License.\nVersion $version"),
+                  if(newerVersion.isNotEmpty) TextButton(child: Text("An update is availalbe"), onPressed: () async {
+                    Uri? uri = await GithubApi.getLatestReleasePage();
+                    if(uri == null) return;
+                    if(!await launchUrl(uri)) {
+                      throw http.ClientException("Failed to open URL");
+                    }
+                  }),
                   const SizedBox(height: 92)
                 ]
               ),
